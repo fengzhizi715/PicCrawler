@@ -33,15 +33,18 @@ import java.util.Arrays;
 /**
  * Created by tony on 2017/9/11.
  */
-public class HttpClientWithPool {
+public class CrawlerClient {
 
     /** 全局连接池对象 */
     private static PoolingHttpClientConnectionManager connManager = null;
 
+    private int timeOut;
+
+
     /**
-     * 静态代码块配置连接池信息
+     * 配置连接池信息
      */
-    static {
+    private CrawlerClient() {
         SSLContext sslcontext = null;
         try {
             //获取TLS安全协议上下文
@@ -79,7 +82,24 @@ public class HttpClientWithPool {
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
+    }
 
+    public static CrawlerClient get() {
+        return Holder.CLIENT;
+    }
+
+    private static class Holder {
+        private static final CrawlerClient CLIENT = new CrawlerClient();
+    }
+
+    /**
+     * @param timeOut 超时时间
+     * @return
+     */
+    public CrawlerClient timeOut(int timeOut) {
+
+        this.timeOut = timeOut;
+        return this;
     }
 
     /**
@@ -88,7 +108,7 @@ public class HttpClientWithPool {
      * @param timeOut 超时时间
      * @return Http客户端连接对象
      */
-    public static CloseableHttpClient getHttpClient(int timeOut) {
+    private CloseableHttpClient getHttpClient(int timeOut) {
         // 创建Http请求配置参数
         RequestConfig requestConfig = RequestConfig.custom()
                 // 获取连接超时时间
@@ -114,10 +134,10 @@ public class HttpClientWithPool {
      * Post请求
      *
      * @param url 请求地址
-     * @param timeOut 超时时间
+     *
      * @return
      */
-    public static String downloadPic(String url, int timeOut,int index) {
+    public String downloadPic(String url,int index) {
         String msg = null;
 
         // 获取客户端连接对象
