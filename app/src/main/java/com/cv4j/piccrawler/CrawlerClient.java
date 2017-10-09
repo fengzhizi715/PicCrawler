@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler;
 
+import com.safframework.tony.common.utils.Preconditions;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -39,12 +40,13 @@ public class CrawlerClient {
     private static PoolingHttpClientConnectionManager connManager = null;
 
     private int timeOut;
-
+    private String path;
 
     /**
-     * 配置连接池信息
+     * 配置连接池信息，支持http/https
      */
     private CrawlerClient() {
+
         SSLContext sslcontext = null;
         try {
             //获取TLS安全协议上下文
@@ -103,6 +105,16 @@ public class CrawlerClient {
     }
 
     /**
+     * @param path 防止图片的路径
+     * @return
+     */
+    public CrawlerClient path(String path) {
+
+        this.path = path;
+        return this;
+    }
+
+    /**
      * 获取Http客户端连接对象
      *
      * @param timeOut 超时时间
@@ -131,7 +143,7 @@ public class CrawlerClient {
     }
 
     /**
-     * Post请求
+     * 下载图片
      *
      * @param url 请求地址
      *
@@ -157,8 +169,28 @@ public class CrawlerClient {
             // 包装成高效流
             BufferedInputStream bis = new BufferedInputStream(is);
 
+            File directory = null;
             // 写入本地
-            File file = new File("images/"+index+".jpg");
+            if (Preconditions.isNotBlank(path)) {
+
+                directory = new File(path);
+                directory.mkdir();
+                if (!directory.exists() || !directory.isDirectory()) {
+
+                    directory = new File("images");
+                    if (!directory.exists()) {
+                        directory.mkdir();
+                    }
+                }
+            } else {
+                directory = new File("images");
+                if (!directory.exists()) {
+                    directory.mkdir();
+                }
+            }
+
+            File file = new File(directory,index+".jpg");
+
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
             byte[] byt = new byte[1024 * 8];
