@@ -1,6 +1,8 @@
 package com.cv4j.piccrawler;
 
 import com.safframework.tony.common.utils.Preconditions;
+import io.reactivex.*;
+import io.reactivex.functions.Function;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -48,8 +50,7 @@ public class CrawlerClient {
     /**
      * 配置连接池信息，支持http/https
      */
-    private CrawlerClient() {
-
+    static {
         SSLContext sslcontext = null;
         try {
             //获取TLS安全协议上下文
@@ -88,6 +89,9 @@ public class CrawlerClient {
         } catch (KeyManagementException e) {
             e.printStackTrace();
         }
+    }
+
+    private CrawlerClient() {
     }
 
     public static CrawlerClient get() {
@@ -170,18 +174,16 @@ public class CrawlerClient {
      */
     public void downloadPic(String url) {
 
-        if (repeat==1) {
-
+        for(int i=0;i<repeat;i++) {
             doDownloadPic(url);
-        } else if (repeat>1) {
-
-            for(int i=0;i<repeat;i++) {
-                doDownloadPic(url);
-            }
         }
     }
 
-    public void doDownloadPic(String url) {
+    /**
+     * 具体实现图片下载的方法
+     * @param url
+     */
+    private void doDownloadPic(String url) {
 
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeOut);
@@ -293,5 +295,36 @@ public class CrawlerClient {
                 }
             }
         }
+    }
+
+    /**
+     * 下载图片
+     *
+     * @param url 图片地址
+     *
+     * @return
+     */
+    public void downloadPicUseRx(String url) {
+
+        Flowable.create(new FlowableOnSubscribe<String>() {
+
+            @Override
+            public void subscribe(FlowableEmitter<String> e) throws Exception {
+
+                for (int i=0;i<repeat;i++) {
+
+                    e.onNext(url);
+                }
+            }
+        },BackpressureStrategy.BUFFER)
+                .map(new Function<String, Object>() {
+
+            @Override
+            public Object apply(String s) throws Exception {
+
+                doDownloadPic(s);
+                return s;
+            }
+        }).subscribe();
     }
 }
