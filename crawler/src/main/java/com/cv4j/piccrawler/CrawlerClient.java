@@ -42,8 +42,8 @@ public class CrawlerClient {
     private static AtomicInteger count = new AtomicInteger();
 
     private int timeOut;
-    private FileStrategy fileStrategy;
     private int repeat = 1;
+    private FileStrategy fileStrategy;
 
     /**
      * 配置连接池信息，支持http/https
@@ -67,6 +67,7 @@ public class CrawlerClient {
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[]{};
                 }}}, null);
+
             SSLConnectionSocketFactory scsf = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
             RequestConfig defaultConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT)
                     .setExpectContinueEnabled(true)
@@ -98,7 +99,7 @@ public class CrawlerClient {
     }
 
     /**
-     * @param timeOut 超时时间
+     * @param timeOut 设置超时时间
      * @return
      */
     public CrawlerClient timeOut(int timeOut) {
@@ -107,12 +108,22 @@ public class CrawlerClient {
         return this;
     }
 
+    /**
+     *
+     * @param fileStrategy 设置生成文件的策略
+     * @return
+     */
     public CrawlerClient fileStrategy(FileStrategy fileStrategy) {
 
         this.fileStrategy = fileStrategy;
         return this;
     }
 
+    /**
+     *
+     * @param repeat 设置重复次数
+     * @return
+     */
     public CrawlerClient repeat(int repeat) {
 
         if (repeat>0) {
@@ -162,9 +173,7 @@ public class CrawlerClient {
         if (repeat==1) {
 
             doDownloadPic(url);
-        }
-
-        if (repeat>1) {
+        } else if (repeat>1) {
 
             for(int i=0;i<repeat;i++) {
                 doDownloadPic(url);
@@ -216,16 +225,19 @@ public class CrawlerClient {
             FileGenType fileGenType = fileStrategy.genType();
 
             File directory = null;
-            // 写入本地
+            // 写入本地文件
             if (Preconditions.isNotBlank(path)) {
 
                 directory = new File(path);
-                directory.mkdir();
-                if (!directory.exists() || !directory.isDirectory()) {
+                if (!directory.exists()) {
 
-                    directory = new File("images");
-                    if (!directory.exists()) {
-                        directory.mkdir();
+                    directory.mkdir();
+
+                    if (!directory.exists() || !directory.isDirectory()) {
+                        directory = new File("images");
+                        if (!directory.exists()) {
+                            directory.mkdir();
+                        }
                     }
                 }
             } else {
@@ -241,6 +253,7 @@ public class CrawlerClient {
                 case RANDOM:
                     fileName = Utils.randomUUID();
                     break;
+
                 case AUTO_INCREMENT:
                     count.incrementAndGet();
                     fileName = String.valueOf(count.get());
