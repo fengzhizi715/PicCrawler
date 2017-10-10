@@ -29,6 +29,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicInteger;
 
 
 /**
@@ -38,9 +39,11 @@ public class CrawlerClient {
 
     /** 全局连接池对象 */
     private static PoolingHttpClientConnectionManager connManager = null;
+    private static AtomicInteger count = new AtomicInteger();
 
     private int timeOut;
-    private String path;
+    private FileStrategy fileStrategy;
+    private int repeat = 1;
 
     /**
      * 配置连接池信息，支持http/https
@@ -104,13 +107,18 @@ public class CrawlerClient {
         return this;
     }
 
-    /**
-     * @param path 防止图片的路径
-     * @return
-     */
-    public CrawlerClient path(String path) {
+    public CrawlerClient fileStrategy(FileStrategy fileStrategy) {
 
-        this.path = path;
+        this.fileStrategy = fileStrategy;
+        return this;
+    }
+
+    public CrawlerClient repeat(int repeat) {
+
+        if (repeat>0) {
+            this.repeat = repeat;
+        }
+
         return this;
     }
 
@@ -145,12 +153,26 @@ public class CrawlerClient {
     /**
      * 下载图片
      *
-     * @param url 请求地址
+     * @param url 图片地址
      *
      * @return
      */
-    public String downloadPic(String url,int index) {
-        String msg = null;
+    public void downloadPic(String url) {
+
+        if (repeat==1) {
+
+            doDownloadPic(url);
+        }
+
+        if (repeat>1) {
+
+            for(int i=0;i<repeat;i++) {
+                doDownloadPic(url);
+            }
+        }
+    }
+
+    public void doDownloadPic(String url) {
 
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeOut);
@@ -168,6 +190,30 @@ public class CrawlerClient {
             InputStream is = entity.getContent();
             // 包装成高效流
             BufferedInputStream bis = new BufferedInputStream(is);
+
+            if (fileStrategy == null) {
+                fileStrategy = new FileStrategy() {
+                    @Override
+                    public String filePath() {
+                        return "images";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.RANDOM;
+                    }
+                };
+            }
+
+            String path = fileStrategy.filePath();
+            String format = fileStrategy.picFormat();
+            FileGenType fileGenType = fileStrategy.genType();
 
             File directory = null;
             // 写入本地
@@ -189,7 +235,19 @@ public class CrawlerClient {
                 }
             }
 
-            File file = new File(directory,index+".jpg");
+            String fileName = null;
+            switch (fileGenType) {
+
+                case RANDOM:
+                    fileName = Utils.randomUUID();
+                    break;
+                case AUTO_INCREMENT:
+                    count.incrementAndGet();
+                    fileName = String.valueOf(count.get());
+                    break;
+            }
+
+            File file = new File(directory,fileName+"."+format);
 
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
@@ -222,7 +280,5 @@ public class CrawlerClient {
                 }
             }
         }
-
-        return msg;
     }
 }
