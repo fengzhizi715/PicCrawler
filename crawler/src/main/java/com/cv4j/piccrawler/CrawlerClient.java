@@ -5,8 +5,6 @@ import io.reactivex.*;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
-import org.apache.http.ParseException;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -207,9 +205,25 @@ public class CrawlerClient {
      */
     public void downloadPicUseRx(String url) {
 
+        Flowable<File> flowable = downloadPicToFlowable(url);
+
+        if (flowable!=null) {
+
+            flowable.subscribe();
+        }
+    }
+
+    /**
+     * 下载图片
+     *
+     * @param url 图片地址
+     * @return
+     */
+    public Flowable<File> downloadPicToFlowable(String url) {
+
         if (repeat==1) {
 
-            Flowable.create(new FlowableOnSubscribe<String>() {
+            return Flowable.create(new FlowableOnSubscribe<String>() {
 
                 @Override
                 public void subscribe(FlowableEmitter<String> e) throws Exception {
@@ -232,10 +246,10 @@ public class CrawlerClient {
 
                             return writeFile(response);
                         }
-                    }).subscribe();
+                    });
 
         } else if (repeat>1) {
-            Flowable.create(new FlowableOnSubscribe<String>() {
+            return Flowable.create(new FlowableOnSubscribe<String>() {
 
                 @Override
                 public void subscribe(FlowableEmitter<String> e) throws Exception {
@@ -262,8 +276,10 @@ public class CrawlerClient {
 
                             return writeFile(response);
                         }
-                    }).subscribe();
+                    });
         }
+
+        return null;
     }
 
     private CloseableHttpResponse createHttp(String url) {
