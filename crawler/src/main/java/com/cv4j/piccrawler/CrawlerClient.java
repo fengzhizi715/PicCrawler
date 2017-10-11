@@ -47,6 +47,7 @@ public class CrawlerClient {
 
     private int timeOut;
     private int repeat = 1;
+    private int sleepTime = 0;
     private FileStrategy fileStrategy;
 
     /**
@@ -141,6 +142,19 @@ public class CrawlerClient {
     }
 
     /**
+     * @param sleepTime 每次请求url时先sleep一段时间，单位是milliseconds
+     * @return
+     */
+    public CrawlerClient sleep(int sleepTime) {
+
+        if (sleepTime > 0) {
+            this.sleepTime = sleepTime;
+        }
+
+        return this;
+    }
+
+    /**
      * 获取Http客户端连接对象
      *
      * @param timeOut 超时时间
@@ -177,6 +191,16 @@ public class CrawlerClient {
     public void downloadPic(String url) {
 
         for (int i = 0; i < repeat; i++) {
+
+            if (sleepTime>0) {
+
+                try {
+                    Thread.sleep(sleepTime);
+                } catch (InterruptedException exception) {
+                    exception.printStackTrace();
+                }
+            }
+
             doDownloadPic(url);
         }
     }
@@ -228,6 +252,15 @@ public class CrawlerClient {
                 @Override
                 public void subscribe(FlowableEmitter<String> e) throws Exception {
 
+                    if (sleepTime>0) {
+
+                        try {
+                            Thread.sleep(sleepTime);
+                        } catch (InterruptedException exception) {
+                            exception.printStackTrace();
+                        }
+                    }
+
                     e.onNext(url);
                 }
             }, BackpressureStrategy.BUFFER)
@@ -255,6 +288,15 @@ public class CrawlerClient {
                 public void subscribe(FlowableEmitter<String> e) throws Exception {
 
                     for (int i = 0; i < repeat; i++) {
+
+                        if (sleepTime>0) {
+
+                            try {
+                                Thread.sleep(sleepTime);
+                            } catch (InterruptedException exception) {
+                                exception.printStackTrace();
+                            }
+                        }
 
                         e.onNext(url);
                     }
