@@ -320,20 +320,20 @@ public class CrawlerClient {
                     e.onNext(url);
                 }
             }, BackpressureStrategy.BUFFER)
-                    .map(new Function<String, WrapResponse>() {
+                    .map(new Function<String, CloseableHttpResponse>() {
 
                         @Override
-                        public WrapResponse apply(String s) throws Exception {
+                        public CloseableHttpResponse apply(String s) throws Exception {
 
                             return createHttp(url);
                         }
                     })
-                    .map(new Function<WrapResponse, File>() {
+                    .map(new Function<CloseableHttpResponse, File>() {
 
                         @Override
-                        public File apply(WrapResponse wrapResponse) throws Exception {
+                        public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeFile(wrapResponse);
+                            return writeFile(response);
                         }
                     }).subscribe();
 
@@ -349,27 +349,27 @@ public class CrawlerClient {
                     }
                 }
             }, BackpressureStrategy.BUFFER)
-                    .map(new Function<String, WrapResponse>() {
+                    .map(new Function<String, CloseableHttpResponse>() {
 
                         @Override
-                        public WrapResponse apply(String s) throws Exception {
+                        public CloseableHttpResponse apply(String s) throws Exception {
 
                             return createHttp(url);
                         }
                     })
                     .observeOn(Schedulers.io())
-                    .map(new Function<WrapResponse, File>() {
+                    .map(new Function<CloseableHttpResponse, File>() {
 
                         @Override
-                        public File apply(WrapResponse wrapResponse) throws Exception {
+                        public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeFile(wrapResponse);
+                            return writeFile(response);
                         }
                     }).subscribe();
         }
     }
 
-    private WrapResponse createHttp(String url) {
+    private CloseableHttpResponse createHttp(String url) {
 
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeOut);
@@ -378,34 +378,25 @@ public class CrawlerClient {
 
         CloseableHttpResponse response = null;
 
-        InputStream is = null;
-
+        // 执行请求
         try {
-            // 执行请求
             response = httpClient.execute(httpPost);
-            // 获取响应实体
-            HttpEntity entity = response.getEntity();
-
-            is = entity.getContent();
-
-        } catch (ClientProtocolException e) {
-            System.err.println("协议错误");
-            e.printStackTrace();
-        } catch (ParseException e) {
-            System.err.println("解析错误");
-            e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("IO错误");
             e.printStackTrace();
         }
 
-        return new WrapResponse(response, is);
+        return response;
     }
 
-    private File writeFile(WrapResponse wrapResponse) throws IOException{
+    private File writeFile(CloseableHttpResponse response) throws IOException{
+
+        // 获取响应实体
+        HttpEntity entity = response.getEntity();
+
+        InputStream is = entity.getContent();
 
         // 包装成高效流
-        BufferedInputStream bis = new BufferedInputStream(wrapResponse.is);
+        BufferedInputStream bis = new BufferedInputStream(is);
 
         if (fileStrategy == null) {
             fileStrategy = new FileStrategy() {
@@ -480,10 +471,10 @@ public class CrawlerClient {
         bos.close();
         bis.close();
 
-        if (wrapResponse.response != null) {
+        if (response != null) {
             try {
-                EntityUtils.consume(wrapResponse.response.getEntity());
-                wrapResponse.response.close();
+                EntityUtils.consume(response.getEntity());
+                response.close();
             } catch (IOException e) {
                 System.err.println("释放链接错误");
                 e.printStackTrace();
