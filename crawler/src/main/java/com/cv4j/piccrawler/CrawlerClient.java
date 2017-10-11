@@ -325,35 +325,7 @@ public class CrawlerClient {
                         @Override
                         public WrapResponse apply(String s) throws Exception {
 
-                            // 获取客户端连接对象
-                            CloseableHttpClient httpClient = getHttpClient(timeOut);
-                            // 创建GET请求对象
-                            HttpPost httpPost = new HttpPost(url);
-
-                            CloseableHttpResponse response = null;
-
-                            InputStream is = null;
-
-                            try {
-                                // 执行请求
-                                response = httpClient.execute(httpPost);
-                                // 获取响应实体
-                                HttpEntity entity = response.getEntity();
-
-                                is = entity.getContent();
-
-                            } catch (ClientProtocolException e) {
-                                System.err.println("协议错误");
-                                e.printStackTrace();
-                            } catch (ParseException e) {
-                                System.err.println("解析错误");
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                System.err.println("IO错误");
-                                e.printStackTrace();
-                            }
-
-                            return new WrapResponse(response, is);
+                            return createHttp(url);
                         }
                     })
                     .map(new Function<WrapResponse, File>() {
@@ -361,93 +333,7 @@ public class CrawlerClient {
                         @Override
                         public File apply(WrapResponse wrapResponse) throws Exception {
 
-                            // 包装成高效流
-                            BufferedInputStream bis = new BufferedInputStream(wrapResponse.is);
-
-                            if (fileStrategy == null) {
-                                fileStrategy = new FileStrategy() {
-                                    @Override
-                                    public String filePath() {
-                                        return "images";
-                                    }
-
-                                    @Override
-                                    public String picFormat() {
-                                        return "png";
-                                    }
-
-                                    @Override
-                                    public FileGenType genType() {
-
-                                        return FileGenType.RANDOM;
-                                    }
-                                };
-                            }
-
-                            String path = fileStrategy.filePath();
-                            String format = fileStrategy.picFormat();
-                            FileGenType fileGenType = fileStrategy.genType();
-
-                            File directory = null;
-                            // 写入本地文件
-                            if (Preconditions.isNotBlank(path)) {
-
-                                directory = new File(path);
-                                if (!directory.exists()) {
-
-                                    directory.mkdir();
-
-                                    if (!directory.exists() || !directory.isDirectory()) {
-                                        directory = new File("images");
-                                        if (!directory.exists()) {
-                                            directory.mkdir();
-                                        }
-                                    }
-                                }
-                            } else {
-                                directory = new File("images");
-                                if (!directory.exists()) {
-                                    directory.mkdir();
-                                }
-                            }
-
-                            String fileName = null;
-                            switch (fileGenType) {
-
-                                case RANDOM:
-                                    fileName = Utils.randomUUID();
-                                    break;
-
-                                case AUTO_INCREMENT:
-                                    count.incrementAndGet();
-                                    fileName = String.valueOf(count.get());
-                                    break;
-                            }
-
-                            File file = new File(directory, fileName + "." + format);
-
-                            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-
-                            byte[] byt = new byte[BUFFER_SIZE];
-                            Integer len = -1;
-                            while ((len = bis.read(byt)) != -1) {
-                                bos.write(byt, 0, len);
-                            }
-
-                            bos.close();
-                            bis.close();
-
-                            if (wrapResponse.response != null) {
-                                try {
-                                    EntityUtils.consume(wrapResponse.response.getEntity());
-                                    wrapResponse.response.close();
-                                } catch (IOException e) {
-                                    System.err.println("释放链接错误");
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            return file;
+                            return writeFile(wrapResponse);
                         }
                     }).subscribe();
 
@@ -468,35 +354,7 @@ public class CrawlerClient {
                         @Override
                         public WrapResponse apply(String s) throws Exception {
 
-                            // 获取客户端连接对象
-                            CloseableHttpClient httpClient = getHttpClient(timeOut);
-                            // 创建GET请求对象
-                            HttpPost httpPost = new HttpPost(url);
-
-                            CloseableHttpResponse response = null;
-
-                            InputStream is = null;
-
-                            try {
-                                // 执行请求
-                                response = httpClient.execute(httpPost);
-                                // 获取响应实体
-                                HttpEntity entity = response.getEntity();
-
-                                is = entity.getContent();
-
-                            } catch (ClientProtocolException e) {
-                                System.err.println("协议错误");
-                                e.printStackTrace();
-                            } catch (ParseException e) {
-                                System.err.println("解析错误");
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                System.err.println("IO错误");
-                                e.printStackTrace();
-                            }
-
-                            return new WrapResponse(response, is);
+                            return createHttp(url);
                         }
                     })
                     .observeOn(Schedulers.io())
@@ -505,95 +363,133 @@ public class CrawlerClient {
                         @Override
                         public File apply(WrapResponse wrapResponse) throws Exception {
 
-                            // 包装成高效流
-                            BufferedInputStream bis = new BufferedInputStream(wrapResponse.is);
-
-                            if (fileStrategy == null) {
-                                fileStrategy = new FileStrategy() {
-                                    @Override
-                                    public String filePath() {
-                                        return "images";
-                                    }
-
-                                    @Override
-                                    public String picFormat() {
-                                        return "png";
-                                    }
-
-                                    @Override
-                                    public FileGenType genType() {
-
-                                        return FileGenType.RANDOM;
-                                    }
-                                };
-                            }
-
-                            String path = fileStrategy.filePath();
-                            String format = fileStrategy.picFormat();
-                            FileGenType fileGenType = fileStrategy.genType();
-
-                            File directory = null;
-                            // 写入本地文件
-                            if (Preconditions.isNotBlank(path)) {
-
-                                directory = new File(path);
-                                if (!directory.exists()) {
-
-                                    directory.mkdir();
-
-                                    if (!directory.exists() || !directory.isDirectory()) {
-                                        directory = new File("images");
-                                        if (!directory.exists()) {
-                                            directory.mkdir();
-                                        }
-                                    }
-                                }
-                            } else {
-                                directory = new File("images");
-                                if (!directory.exists()) {
-                                    directory.mkdir();
-                                }
-                            }
-
-                            String fileName = null;
-                            switch (fileGenType) {
-
-                                case RANDOM:
-                                    fileName = Utils.randomUUID();
-                                    break;
-
-                                case AUTO_INCREMENT:
-                                    count.incrementAndGet();
-                                    fileName = String.valueOf(count.get());
-                                    break;
-                            }
-
-                            File file = new File(directory, fileName + "." + format);
-
-                            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-
-                            byte[] byt = new byte[BUFFER_SIZE];
-                            Integer len = -1;
-                            while ((len = bis.read(byt)) != -1) {
-                                bos.write(byt, 0, len);
-                            }
-
-                            bos.close();
-                            bis.close();
-
-                            if (wrapResponse.response != null) {
-                                try {
-                                    EntityUtils.consume(wrapResponse.response.getEntity());
-                                    wrapResponse.response.close();
-                                } catch (IOException e) {
-                                    System.err.println("释放链接错误");
-                                    e.printStackTrace();
-                                }
-                            }
-
-                            return file;
+                            return writeFile(wrapResponse);
                         }
                     }).subscribe();
         }
     }
-}
+
+    private WrapResponse createHttp(String url) {
+
+        // 获取客户端连接对象
+        CloseableHttpClient httpClient = getHttpClient(timeOut);
+        // 创建GET请求对象
+        HttpPost httpPost = new HttpPost(url);
+
+        CloseableHttpResponse response = null;
+
+        InputStream is = null;
+
+        try {
+            // 执行请求
+            response = httpClient.execute(httpPost);
+            // 获取响应实体
+            HttpEntity entity = response.getEntity();
+
+            is = entity.getContent();
+
+        } catch (ClientProtocolException e) {
+            System.err.println("协议错误");
+            e.printStackTrace();
+        } catch (ParseException e) {
+            System.err.println("解析错误");
+            e.printStackTrace();
+        } catch (IOException e) {
+            System.err.println("IO错误");
+            e.printStackTrace();
+        }
+
+        return new WrapResponse(response, is);
+    }
+
+    private File writeFile(WrapResponse wrapResponse) throws IOException{
+
+        // 包装成高效流
+        BufferedInputStream bis = new BufferedInputStream(wrapResponse.is);
+
+        if (fileStrategy == null) {
+            fileStrategy = new FileStrategy() {
+                @Override
+                public String filePath() {
+                    return "images";
+                }
+
+                @Override
+                public String picFormat() {
+                    return "png";
+                }
+
+                @Override
+                public FileGenType genType() {
+
+                    return FileGenType.RANDOM;
+                }
+            };
+        }
+
+        String path = fileStrategy.filePath();
+        String format = fileStrategy.picFormat();
+        FileGenType fileGenType = fileStrategy.genType();
+
+        File directory = null;
+        // 写入本地文件
+        if (Preconditions.isNotBlank(path)) {
+
+            directory = new File(path);
+            if (!directory.exists()) {
+
+                directory.mkdir();
+
+                if (!directory.exists() || !directory.isDirectory()) {
+                    directory = new File("images");
+                    if (!directory.exists()) {
+                        directory.mkdir();
+                    }
+                }
+            }
+        } else {
+            directory = new File("images");
+            if (!directory.exists()) {
+                directory.mkdir();
+            }
+        }
+
+        String fileName = null;
+        switch (fileGenType) {
+
+            case RANDOM:
+                fileName = Utils.randomUUID();
+                break;
+
+            case AUTO_INCREMENT:
+                count.incrementAndGet();
+                fileName = String.valueOf(count.get());
+                break;
+        }
+
+        File file = new File(directory, fileName + "." + format);
+
+        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+
+        byte[] byt = new byte[BUFFER_SIZE];
+        Integer len = -1;
+        while ((len = bis.read(byt)) != -1) {
+            bos.write(byt, 0, len);
+        }
+
+        bos.close();
+        bis.close();
+
+        if (wrapResponse.response != null) {
+            try {
+                EntityUtils.consume(wrapResponse.response.getEntity());
+                wrapResponse.response.close();
+            } catch (IOException e) {
+                System.err.println("释放链接错误");
+                e.printStackTrace();
+            }
+        }
+
+        return file;
+    }
+ }
