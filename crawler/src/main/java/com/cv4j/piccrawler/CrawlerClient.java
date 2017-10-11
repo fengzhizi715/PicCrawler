@@ -190,26 +190,11 @@ public class CrawlerClient {
      */
     private void doDownloadPic(String url) {
 
-        // 获取客户端连接对象
-        CloseableHttpClient httpClient = getHttpClient(timeOut);
-        // 创建GET请求对象
-        HttpPost httpPost = new HttpPost(url);
-
-        CloseableHttpResponse response = null;
+        CloseableHttpResponse response = createHttp(url);
 
         try {
-            // 执行请求
-            response = httpClient.execute(httpPost);
-
             writeFile(response);
-        } catch (ClientProtocolException e) {
-            System.err.println("协议错误");
-            e.printStackTrace();
-        } catch (ParseException e) {
-            System.err.println("解析错误");
-            e.printStackTrace();
         } catch (IOException e) {
-            System.err.println("IO错误");
             e.printStackTrace();
         }
     }
