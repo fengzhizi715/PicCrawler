@@ -35,9 +35,10 @@ Maven:
 ```
 
 # 使用方法：
+1. 普通方式
 
 ```java
-        String url = "..." // 图片的地址
+        String url = "..."; // 图片的地址
         CrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
@@ -62,10 +63,10 @@ Maven:
                 .downloadPic(url);
 ```
 
-下载图片的方法也可以使用RxJava
+2. 使用RxJava
 
 ```java
-        String url = "..." // 图片的地址
+        String url = "..."; // 图片的地址
         CrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
@@ -88,6 +89,41 @@ Maven:
                 })
                 .repeat(200)
                 .downloadPicUseRx(url);
+```
+
+3. 使用RxJava，下载完的图片还能做后续的处理
+
+```java
+        String url = "..."; // 图片的地址
+
+        CrawlerClient.get()
+                .timeOut(6000)
+                .fileStrategy(new FileStrategy() {
+
+                    @Override
+                    public String filePath() {
+                        return "temp";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.AUTO_INCREMENT;
+                    }
+                })
+                .repeat(20)
+                .downloadPicToFlowable(url)
+                .subscribe(new Consumer<File>() {
+                    @Override
+                    public void accept(File file) throws Exception {
+                        // do something
+                    }
+                });
 ```
 
 稍后，我会加上支持抓取多个图片url的方法。
