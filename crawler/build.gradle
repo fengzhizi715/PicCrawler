@@ -36,7 +36,7 @@ publish{
     userOrg = 'fengzhizi715'
     groupId = 'com.cv4j.piccrawler'
     artifactId = 'crawler'
-    publishVersion = '0.0.1'
+    publishVersion = '0.0.2'
     desc = 'this is a crawler library only for picture'
     website = 'https://github.com/fengzhizi715/PicCrawler'
 }
