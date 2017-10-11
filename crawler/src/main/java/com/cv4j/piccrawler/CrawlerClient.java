@@ -3,6 +3,7 @@ package com.cv4j.piccrawler;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
 import io.reactivex.functions.Function;
+import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
@@ -39,7 +40,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CrawlerClient {
 
-    /** 全局连接池对象 */
+    /**
+     * 全局连接池对象
+     */
     private static PoolingHttpClientConnectionManager connManager = null;
     private static AtomicInteger count = new AtomicInteger();
 
@@ -60,14 +63,17 @@ public class CrawlerClient {
                 public void checkClientTrusted(X509Certificate[] arg0, String arg1)
                         throws CertificateException {
                 }
+
                 @Override
                 public void checkServerTrusted(X509Certificate[] arg0, String arg1)
                         throws CertificateException {
                 }
+
                 @Override
                 public X509Certificate[] getAcceptedIssuers() {
                     return new X509Certificate[]{};
-                }}}, null);
+                }
+            }}, null);
 
             SSLConnectionSocketFactory scsf = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
             RequestConfig defaultConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT)
@@ -113,7 +119,6 @@ public class CrawlerClient {
     }
 
     /**
-     *
      * @param fileStrategy 设置生成文件的策略
      * @return
      */
@@ -124,13 +129,12 @@ public class CrawlerClient {
     }
 
     /**
-     *
      * @param repeat 设置重复次数
      * @return
      */
     public CrawlerClient repeat(int repeat) {
 
-        if (repeat>0) {
+        if (repeat > 0) {
             this.repeat = repeat;
         }
 
@@ -169,18 +173,18 @@ public class CrawlerClient {
      * 下载图片
      *
      * @param url 图片地址
-     *
      * @return
      */
     public void downloadPic(String url) {
 
-        for(int i=0;i<repeat;i++) {
+        for (int i = 0; i < repeat; i++) {
             doDownloadPic(url);
         }
     }
 
     /**
      * 具体实现图片下载的方法
+     *
      * @param url
      */
     private void doDownloadPic(String url) {
@@ -262,7 +266,7 @@ public class CrawlerClient {
                     break;
             }
 
-            File file = new File(directory,fileName+"."+format);
+            File file = new File(directory, fileName + "." + format);
 
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
@@ -285,7 +289,7 @@ public class CrawlerClient {
             System.err.println("IO错误");
             e.printStackTrace();
         } finally {
-            if (response!= null) {
+            if (response != null) {
                 try {
                     EntityUtils.consume(response.getEntity());
                     response.close();
@@ -301,7 +305,6 @@ public class CrawlerClient {
      * 下载图片
      *
      * @param url 图片地址
-     *
      * @return
      */
     public void downloadPicUseRx(String url) {
@@ -311,20 +314,142 @@ public class CrawlerClient {
             @Override
             public void subscribe(FlowableEmitter<String> e) throws Exception {
 
-                for (int i=0;i<repeat;i++) {
+                for (int i = 0; i < repeat; i++) {
 
                     e.onNext(url);
                 }
             }
-        },BackpressureStrategy.BUFFER)
-                .map(new Function<String, Object>() {
+        }, BackpressureStrategy.BUFFER)
+                .map(new Function<String, WrapResponse>() {
 
-            @Override
-            public Object apply(String s) throws Exception {
+                    @Override
+                    public WrapResponse apply(String s) throws Exception {
 
-                doDownloadPic(s);
-                return s;
-            }
-        }).subscribe();
+                        // 获取客户端连接对象
+                        CloseableHttpClient httpClient = getHttpClient(timeOut);
+                        // 创建GET请求对象
+                        HttpPost httpPost = new HttpPost(url);
+
+                        CloseableHttpResponse response = null;
+
+                        InputStream is = null;
+
+                        try {
+                            // 执行请求
+                            response = httpClient.execute(httpPost);
+                            // 获取响应实体
+                            HttpEntity entity = response.getEntity();
+
+                            is = entity.getContent();
+
+                        } catch (ClientProtocolException e) {
+                            System.err.println("协议错误");
+                            e.printStackTrace();
+                        } catch (ParseException e) {
+                            System.err.println("解析错误");
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            System.err.println("IO错误");
+                            e.printStackTrace();
+                        }
+
+                        return new WrapResponse(response, is);
+                    }
+                })
+                .observeOn(Schedulers.io())
+                .map(new Function<WrapResponse, File>() {
+
+                    @Override
+                    public File apply(WrapResponse wrapResponse) throws Exception {
+
+                        // 包装成高效流
+                        BufferedInputStream bis = new BufferedInputStream(wrapResponse.is);
+
+                        if (fileStrategy == null) {
+                            fileStrategy = new FileStrategy() {
+                                @Override
+                                public String filePath() {
+                                    return "images";
+                                }
+
+                                @Override
+                                public String picFormat() {
+                                    return "png";
+                                }
+
+                                @Override
+                                public FileGenType genType() {
+
+                                    return FileGenType.RANDOM;
+                                }
+                            };
+                        }
+
+                        String path = fileStrategy.filePath();
+                        String format = fileStrategy.picFormat();
+                        FileGenType fileGenType = fileStrategy.genType();
+
+                        File directory = null;
+                        // 写入本地文件
+                        if (Preconditions.isNotBlank(path)) {
+
+                            directory = new File(path);
+                            if (!directory.exists()) {
+
+                                directory.mkdir();
+
+                                if (!directory.exists() || !directory.isDirectory()) {
+                                    directory = new File("images");
+                                    if (!directory.exists()) {
+                                        directory.mkdir();
+                                    }
+                                }
+                            }
+                        } else {
+                            directory = new File("images");
+                            if (!directory.exists()) {
+                                directory.mkdir();
+                            }
+                        }
+
+                        String fileName = null;
+                        switch (fileGenType) {
+
+                            case RANDOM:
+                                fileName = Utils.randomUUID();
+                                break;
+
+                            case AUTO_INCREMENT:
+                                count.incrementAndGet();
+                                fileName = String.valueOf(count.get());
+                                break;
+                        }
+
+                        File file = new File(directory, fileName + "." + format);
+
+                        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+
+                        byte[] byt = new byte[1024 * 8];
+                        Integer len = -1;
+                        while ((len = bis.read(byt)) != -1) {
+                            bos.write(byt, 0, len);
+                        }
+
+                        bos.close();
+                        bis.close();
+
+                        if (wrapResponse.response != null) {
+                            try {
+                                EntityUtils.consume(wrapResponse.response.getEntity());
+                                wrapResponse.response.close();
+                            } catch (IOException e) {
+                                System.err.println("释放链接错误");
+                                e.printStackTrace();
+                            }
+                        }
+
+                        return file;
+                    }
+                }).subscribe();
     }
 }
