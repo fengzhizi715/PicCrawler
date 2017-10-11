@@ -45,6 +45,7 @@ public class CrawlerClient {
      */
     private static PoolingHttpClientConnectionManager connManager = null;
     private static AtomicInteger count = new AtomicInteger();
+    private final static int BUFFER_SIZE = 0x2000; // 8192
 
     private int timeOut;
     private int repeat = 1;
@@ -270,7 +271,7 @@ public class CrawlerClient {
 
             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
-            byte[] byt = new byte[1024 * 8];
+            byte[] byt = new byte[BUFFER_SIZE];
             Integer len = -1;
             while ((len = bis.read(byt)) != -1) {
                 bos.write(byt, 0, len);
@@ -427,7 +428,7 @@ public class CrawlerClient {
 
                             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
-                            byte[] byt = new byte[1024 * 8];
+                            byte[] byt = new byte[BUFFER_SIZE];
                             Integer len = -1;
                             while ((len = bis.read(byt)) != -1) {
                                 bos.write(byt, 0, len);
@@ -571,7 +572,7 @@ public class CrawlerClient {
 
                             BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
 
-                            byte[] byt = new byte[1024 * 8];
+                            byte[] byt = new byte[BUFFER_SIZE];
                             Integer len = -1;
                             while ((len = bis.read(byt)) != -1) {
                                 bos.write(byt, 0, len);
