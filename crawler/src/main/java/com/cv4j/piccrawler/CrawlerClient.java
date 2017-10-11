@@ -200,86 +200,8 @@ public class CrawlerClient {
         try {
             // 执行请求
             response = httpClient.execute(httpPost);
-            // 获取响应实体
-            HttpEntity entity = response.getEntity();
 
-            InputStream is = entity.getContent();
-            // 包装成高效流
-            BufferedInputStream bis = new BufferedInputStream(is);
-
-            if (fileStrategy == null) {
-                fileStrategy = new FileStrategy() {
-                    @Override
-                    public String filePath() {
-                        return "images";
-                    }
-
-                    @Override
-                    public String picFormat() {
-                        return "png";
-                    }
-
-                    @Override
-                    public FileGenType genType() {
-
-                        return FileGenType.RANDOM;
-                    }
-                };
-            }
-
-            String path = fileStrategy.filePath();
-            String format = fileStrategy.picFormat();
-            FileGenType fileGenType = fileStrategy.genType();
-
-            File directory = null;
-            // 写入本地文件
-            if (Preconditions.isNotBlank(path)) {
-
-                directory = new File(path);
-                if (!directory.exists()) {
-
-                    directory.mkdir();
-
-                    if (!directory.exists() || !directory.isDirectory()) {
-                        directory = new File("images");
-                        if (!directory.exists()) {
-                            directory.mkdir();
-                        }
-                    }
-                }
-            } else {
-                directory = new File("images");
-                if (!directory.exists()) {
-                    directory.mkdir();
-                }
-            }
-
-            String fileName = null;
-            switch (fileGenType) {
-
-                case RANDOM:
-                    fileName = Utils.randomUUID();
-                    break;
-
-                case AUTO_INCREMENT:
-                    count.incrementAndGet();
-                    fileName = String.valueOf(count.get());
-                    break;
-            }
-
-            File file = new File(directory, fileName + "." + format);
-
-            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
-
-            byte[] byt = new byte[BUFFER_SIZE];
-            Integer len = -1;
-            while ((len = bis.read(byt)) != -1) {
-                bos.write(byt, 0, len);
-            }
-
-            bos.close();
-            bis.close();
-
+            writeFile(response);
         } catch (ClientProtocolException e) {
             System.err.println("协议错误");
             e.printStackTrace();
@@ -289,16 +211,6 @@ public class CrawlerClient {
         } catch (IOException e) {
             System.err.println("IO错误");
             e.printStackTrace();
-        } finally {
-            if (response != null) {
-                try {
-                    EntityUtils.consume(response.getEntity());
-                    response.close();
-                } catch (IOException e) {
-                    System.err.println("释放链接错误");
-                    e.printStackTrace();
-                }
-            }
         }
     }
 
