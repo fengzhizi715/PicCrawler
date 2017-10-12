@@ -5,6 +5,7 @@ import io.reactivex.*;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
+import org.apache.http.HttpHost;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -52,6 +53,7 @@ public class CrawlerClient {
     private int repeat = 1;
     private int sleepTime = 0;
     private FileStrategy fileStrategy;
+    private HttpHost proxy;
 
     /**
      * 配置连接池信息，支持http/https
@@ -158,21 +160,46 @@ public class CrawlerClient {
     }
 
     /**
+     *
+     * @param proxy
+     * @return
+     */
+    public CrawlerClient proxy(HttpHost proxy) {
+
+        this.proxy = proxy;
+        return this;
+    }
+
+    /**
      * 获取Http客户端连接对象
      *
      * @param timeOut 超时时间
      * @return Http客户端连接对象
      */
     private CloseableHttpClient getHttpClient(int timeOut) {
+
         // 创建Http请求配置参数
-        RequestConfig requestConfig = RequestConfig.custom()
-                // 获取连接超时时间
-                .setConnectionRequestTimeout(timeOut)
-                // 请求超时时间
-                .setConnectTimeout(timeOut)
-                // 响应超时时间
-                .setSocketTimeout(timeOut)
-                .build();
+        RequestConfig requestConfig = null;
+        if (proxy!=null) {
+            requestConfig = RequestConfig.custom()
+                    // 获取连接超时时间
+                    .setConnectionRequestTimeout(timeOut)
+                    // 请求超时时间
+                    .setConnectTimeout(timeOut)
+                    // 响应超时时间
+                    .setSocketTimeout(timeOut)
+                    .setProxy(proxy)
+                    .build();
+        } else {
+            requestConfig = RequestConfig.custom()
+                    // 获取连接超时时间
+                    .setConnectionRequestTimeout(timeOut)
+                    // 请求超时时间
+                    .setConnectTimeout(timeOut)
+                    // 响应超时时间
+                    .setSocketTimeout(timeOut)
+                    .build();
+        }
 
         // 创建httpClient
         return HttpClients.custom()
