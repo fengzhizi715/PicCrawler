@@ -59,7 +59,7 @@ Maven:
                         return FileGenType.AUTO_INCREMENT;
                     }
                 })
-                .repeat(200)
+                .repeat(200) // 重复200次
                 .downloadPic(url);
 ```
 
@@ -91,7 +91,7 @@ Maven:
                 .downloadPicUseRx(url);
 ```
 
-3. 使用RxJava，下载完的图片还能做后续的处理
+3. 使用RxJava，下载之后的图片还能做后续的处理
 
 ```java
         String url = "..."; // 图片的地址
