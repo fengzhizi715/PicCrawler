@@ -327,18 +327,24 @@ public class CrawlerClient {
         return null;
     }
 
+    /**
+     * 下载多张图片
+     * @param urls
+     */
     public void downloadPics(List<String> urls) {
 
-        urls.forEach(url->{
+        if (Preconditions.isNotBlank(urls)) {
+            urls.forEach(url->{
 
-            try {
-                CompletableFuture.runAsync(() -> downloadPic(url)).get();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            } catch (ExecutionException e) {
-                e.printStackTrace();
-            }
-        });
+                try {
+                    CompletableFuture.runAsync(() -> downloadPic(url)).get();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                } catch (ExecutionException e) {
+                    e.printStackTrace();
+                }
+            });
+        }
     }
 
     /**
