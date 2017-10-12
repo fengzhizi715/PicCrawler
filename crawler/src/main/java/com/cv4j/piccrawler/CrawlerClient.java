@@ -30,6 +30,9 @@ import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 
@@ -215,7 +218,7 @@ public class CrawlerClient {
         CloseableHttpResponse response = createHttp(url);
 
         try {
-            writeFile(response);
+            writeToFile(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -277,7 +280,7 @@ public class CrawlerClient {
                         @Override
                         public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeFile(response);
+                            return writeToFile(response);
                         }
                     });
 
@@ -316,7 +319,7 @@ public class CrawlerClient {
                         @Override
                         public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeFile(response);
+                            return writeToFile(response);
                         }
                     });
         }
@@ -324,6 +327,25 @@ public class CrawlerClient {
         return null;
     }
 
+    public void downloadPics(List<String> urls) {
+
+        urls.forEach(url->{
+
+            try {
+                CompletableFuture.runAsync(() -> downloadPic(url)).get();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            } catch (ExecutionException e) {
+                e.printStackTrace();
+            }
+        });
+    }
+
+    /**
+     * 创建网络请求
+     * @param url
+     * @return
+     */
     private CloseableHttpResponse createHttp(String url) {
 
         // 获取客户端连接对象
@@ -343,7 +365,13 @@ public class CrawlerClient {
         return response;
     }
 
-    private File writeFile(CloseableHttpResponse response) throws IOException{
+    /**
+     * 将response的响应流写入文件中
+     * @param response
+     * @return
+     * @throws IOException
+     */
+    private File writeToFile(CloseableHttpResponse response) throws IOException{
 
         // 获取响应实体
         HttpEntity entity = response.getEntity();
