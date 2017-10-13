@@ -447,7 +447,11 @@ public class CrawlerClient {
             directory = new File(path);
             if (!directory.exists()) {
 
-                directory.mkdir();
+                if (path.contains("/")) {
+                    directory.mkdirs();
+                } else {
+                    directory.mkdir();
+                }
 
                 if (!directory.exists() || !directory.isDirectory()) {
 
