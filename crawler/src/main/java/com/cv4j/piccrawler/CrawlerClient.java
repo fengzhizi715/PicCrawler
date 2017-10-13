@@ -12,6 +12,7 @@ import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
@@ -23,6 +24,10 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.util.EntityUtils;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -32,6 +37,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -54,6 +60,7 @@ public class CrawlerClient {
     private int timeOut;
     private int repeat = 1;
     private int sleepTime = 0;
+    private String userAgent;
     private FileStrategy fileStrategy;
     private HttpHost proxy;
 
@@ -113,6 +120,16 @@ public class CrawlerClient {
 
     private static class Holder {
         private static final CrawlerClient CLIENT = new CrawlerClient();
+    }
+
+    /**
+     * @param userAgent
+     * @return
+     */
+    public CrawlerClient ua(String userAgent) {
+
+        this.userAgent = userAgent;
+        return this;
     }
 
     /**
@@ -248,7 +265,7 @@ public class CrawlerClient {
         CloseableHttpResponse response = createHttp(url);
 
         try {
-            writeToFile(response);
+            writeImageToFile(response);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -310,7 +327,7 @@ public class CrawlerClient {
                         @Override
                         public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeToFile(response);
+                            return writeImageToFile(response);
                         }
                     });
 
@@ -349,7 +366,7 @@ public class CrawlerClient {
                         @Override
                         public File apply(CloseableHttpResponse response) throws Exception {
 
-                            return writeToFile(response);
+                            return writeImageToFile(response);
                         }
                     });
         }
@@ -378,6 +395,21 @@ public class CrawlerClient {
     }
 
     /**
+     * 下载整个网页的全部图片
+     * @param url
+     */
+    public void downloadWebPageImages(String url) {
+
+        CloseableHttpResponse response = createHttpWithGet(url);
+
+        try {
+            writeImagesToFile(response);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
      * 创建网络请求
      * @param url
      * @return
@@ -386,7 +418,7 @@ public class CrawlerClient {
 
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeOut);
-        // 创建GET请求对象
+        // 创建Post请求对象
         HttpPost httpPost = new HttpPost(url);
 
         CloseableHttpResponse response = null;
@@ -401,16 +433,43 @@ public class CrawlerClient {
         return response;
     }
 
+    private CloseableHttpResponse createHttpWithGet(String url) {
+
+        // 获取客户端连接对象
+        CloseableHttpClient httpClient = getHttpClient(timeOut);
+        // 创建Get请求对象
+        HttpGet httpGet = new HttpGet(url);
+
+        if (Preconditions.isNotBlank(userAgent)) {
+            httpGet.addHeader("User-Agent",userAgent);
+        }
+
+        CloseableHttpResponse response = null;
+
+        // 执行请求
+        try {
+            response = httpClient.execute(httpGet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
     /**
      * 将response的响应流写入文件中
      * @param response
      * @return
      * @throws IOException
      */
-    private File writeToFile(CloseableHttpResponse response) throws IOException{
+    private File writeImageToFile(CloseableHttpResponse response) throws IOException{
+
+        if (response==null) return null;
 
         // 获取响应实体
         HttpEntity entity = response.getEntity();
+
+        if (entity==null) return null;
 
         InputStream is = entity.getContent();
 
@@ -457,11 +516,11 @@ public class CrawlerClient {
 
                 if (!directory.exists() || !directory.isDirectory()) {
 
-                    directory = mkDefaultDir(directory);
+                    directory = Utils.mkDefaultDir(directory);
                 }
             }
         } else {
-            directory = mkDefaultDir(directory);
+            directory = Utils.mkDefaultDir(directory);
         }
 
         String fileName = null;
@@ -518,16 +577,45 @@ public class CrawlerClient {
     }
 
     /**
-     * 创建默认的文件夹用于存放图片
-     * @param directory
+     * 将response的响应流写入文件中
+     * @param response
+     * @return
+     * @throws IOException
      */
-    private File mkDefaultDir(File directory) {
+    public void writeImagesToFile(CloseableHttpResponse response) throws IOException{
 
-        directory = new File("images");
-        if (!directory.exists()) {
-            directory.mkdir();
+        // 获取响应实体
+        HttpEntity entity = response.getEntity();
+
+        InputStream is = entity.getContent();
+
+        String html = Utils.inputStream2Str(is);
+
+        Document doc = Jsoup.parse(html);
+
+        Elements media = doc.select("[src]");
+        List<String> urls = new ArrayList<>();
+
+        for (Element src : media) {
+            if (src.tagName().equals("img")) {
+
+                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+                    System.out.println(src.attr("abs:src"));
+                    urls.add(src.attr("abs:src"));
+                }
+            }
         }
 
-        return directory;
+        if (response != null) {
+            try {
+                EntityUtils.consume(response.getEntity());
+                response.close();
+            } catch (IOException e) {
+                System.err.println("释放链接错误");
+                e.printStackTrace();
+            }
+        }
+
+        downloadPics(urls);
     }
  }
