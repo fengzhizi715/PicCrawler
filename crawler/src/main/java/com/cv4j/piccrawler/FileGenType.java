@@ -7,5 +7,6 @@ package com.cv4j.piccrawler;
 public enum FileGenType {
 
     RANDOM,
-    AUTO_INCREMENT
+    AUTO_INCREMENT,
+    NORMAL
 }

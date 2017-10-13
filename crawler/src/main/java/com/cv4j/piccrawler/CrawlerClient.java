@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
+import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
 import io.reactivex.functions.Function;
@@ -418,6 +419,7 @@ public class CrawlerClient {
 
         if (fileStrategy == null) {
             fileStrategy = new FileStrategy() {
+
                 @Override
                 public String filePath() {
                     return "images";
@@ -481,6 +483,11 @@ public class CrawlerClient {
 
                 count.incrementAndGet();
                 fileName = String.valueOf(count.get());
+                break;
+
+            case NORMAL:
+
+                fileName = ((NormalStrategy)fileStrategy).fileName();
                 break;
         }
 
