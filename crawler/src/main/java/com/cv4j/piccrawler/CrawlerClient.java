@@ -450,17 +450,12 @@ public class CrawlerClient {
                 directory.mkdir();
 
                 if (!directory.exists() || !directory.isDirectory()) {
-                    directory = new File("images");
-                    if (!directory.exists()) {
-                        directory.mkdir();
-                    }
+
+                    directory = mkDefaultDir(directory);
                 }
             }
         } else {
-            directory = new File("images");
-            if (!directory.exists()) {
-                directory.mkdir();
-            }
+            directory = mkDefaultDir(directory);
         }
 
         String fileName = null;
@@ -509,5 +504,19 @@ public class CrawlerClient {
         }
 
         return file;
+    }
+
+    /**
+     * 创建默认的文件夹用于存放图片
+     * @param directory
+     */
+    private File mkDefaultDir(File directory) {
+
+        directory = new File("images");
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
+
+        return directory;
     }
  }
