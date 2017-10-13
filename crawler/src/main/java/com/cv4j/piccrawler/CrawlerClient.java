@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler;
 
+import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
 import io.reactivex.functions.Function;
@@ -161,7 +162,7 @@ public class CrawlerClient {
 
     /**
      *
-     * @param proxy
+     * @param proxy 代理的host
      * @return
      */
     public CrawlerClient proxy(HttpHost proxy) {
@@ -465,10 +466,19 @@ public class CrawlerClient {
         switch (fileGenType) {
 
             case RANDOM:
+
                 fileName = Utils.randomUUID();
                 break;
 
             case AUTO_INCREMENT:
+
+                if (fileStrategy instanceof AutoIncrementStrategy) {
+
+                    if (count.get()< ((AutoIncrementStrategy) fileStrategy).start()) {
+                        count.set(((AutoIncrementStrategy) fileStrategy).start());
+                    }
+                }
+
                 count.incrementAndGet();
                 fileName = String.valueOf(count.get());
                 break;

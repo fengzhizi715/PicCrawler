@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.strategy;
 
+import com.cv4j.piccrawler.FileGenType;
 import com.cv4j.piccrawler.FileStrategy;
 
 /**
@@ -10,5 +11,10 @@ public abstract class AutoIncrementStrategy implements FileStrategy {
     public int start() {
 
         return 0;
+    }
+
+    public FileGenType genType(){
+
+        return FileGenType.AUTO_INCREMENT;
     }
 }
