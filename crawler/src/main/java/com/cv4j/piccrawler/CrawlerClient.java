@@ -181,6 +181,7 @@ public class CrawlerClient {
 
         // 创建Http请求配置参数
         RequestConfig requestConfig = null;
+
         if (proxy!=null) {
             requestConfig = RequestConfig.custom()
                     // 获取连接超时时间
