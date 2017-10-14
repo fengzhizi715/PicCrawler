@@ -313,22 +313,8 @@ public class CrawlerClient {
                     e.onNext(url);
                 }
             }, BackpressureStrategy.BUFFER)
-                    .map(new Function<String, CloseableHttpResponse>() {
-
-                        @Override
-                        public CloseableHttpResponse apply(String s) throws Exception {
-
-                            return createHttpWithPost(url);
-                        }
-                    })
-                    .map(new Function<CloseableHttpResponse, File>() {
-
-                        @Override
-                        public File apply(CloseableHttpResponse response) throws Exception {
-
-                            return writeImageToFile(response);
-                        }
-                    });
+                    .map(s->createHttpWithPost(s))
+                    .map(response->writeImageToFile(response));
 
         } else if (repeat>1) {
             return Flowable.create(new FlowableOnSubscribe<String>() {
@@ -351,23 +337,9 @@ public class CrawlerClient {
                     }
                 }
             }, BackpressureStrategy.BUFFER)
-                    .map(new Function<String, CloseableHttpResponse>() {
-
-                        @Override
-                        public CloseableHttpResponse apply(String s) throws Exception {
-
-                            return createHttpWithPost(url);
-                        }
-                    })
+                    .map(s->createHttpWithPost(s))
                     .observeOn(Schedulers.io())
-                    .map(new Function<CloseableHttpResponse, File>() {
-
-                        @Override
-                        public File apply(CloseableHttpResponse response) throws Exception {
-
-                            return writeImageToFile(response);
-                        }
-                    });
+                    .map(response->writeImageToFile(response));
         }
 
         return null;
@@ -400,27 +372,9 @@ public class CrawlerClient {
     public void downloadWebPageImages(String url) {
 
         Flowable.just(url)
-                .map(new Function<String, CloseableHttpResponse>() {
-
-                    @Override
-                    public CloseableHttpResponse apply(String s) throws Exception {
-                        return createHttpWithGet(s);
-                    }
-                })
-                .map(new Function<CloseableHttpResponse, List<String>>() {
-
-                    @Override
-                    public List<String> apply(CloseableHttpResponse response) throws Exception {
-
-                        return parseHtmlToImages(response);
-                    }
-                })
-                .subscribe(new Consumer<List<String>>() {
-                    @Override
-                    public void accept(List<String> strings) throws Exception {
-                        downloadPics(strings);
-                    }
-                });
+                .map(s->createHttpWithGet(s))
+                .map(response->parseHtmlToImages(response))
+                .subscribe(urls->downloadPics(urls));
     }
 
     /**
@@ -613,7 +567,7 @@ public class CrawlerClient {
             if (src.tagName().equals("img")) {
 
                 if (Preconditions.isNotBlank(src.attr("abs:src"))) {
-//                                    System.out.println(src.attr("abs:src"));
+
                     urls.add(src.attr("abs:src"));
                 }
             }
