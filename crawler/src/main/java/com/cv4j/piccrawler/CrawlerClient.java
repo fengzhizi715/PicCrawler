@@ -123,7 +123,7 @@ public class CrawlerClient {
     }
 
     /**
-     * @param userAgent
+     * @param userAgent 添加User-Agent
      * @return
      */
     public CrawlerClient ua(String userAgent) {
@@ -262,7 +262,7 @@ public class CrawlerClient {
      */
     private void doDownloadPic(String url) {
 
-        CloseableHttpResponse response = createHttp(url);
+        CloseableHttpResponse response = createHttpWithPost(url);
 
         try {
             writeImageToFile(response);
@@ -319,7 +319,7 @@ public class CrawlerClient {
                         @Override
                         public CloseableHttpResponse apply(String s) throws Exception {
 
-                            return createHttp(url);
+                            return createHttpWithPost(url);
                         }
                     })
                     .map(new Function<CloseableHttpResponse, File>() {
@@ -357,7 +357,7 @@ public class CrawlerClient {
                         @Override
                         public CloseableHttpResponse apply(String s) throws Exception {
 
-                            return createHttp(url);
+                            return createHttpWithPost(url);
                         }
                     })
                     .observeOn(Schedulers.io())
@@ -394,27 +394,27 @@ public class CrawlerClient {
         }
     }
 
-    /**
-     * 下载整个网页的全部图片
-     * @param url
-     */
-    public void downloadWebPageImages(String url) {
-
-        CloseableHttpResponse response = createHttpWithGet(url);
-
-        try {
-            writeImagesToFile(response);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+//    /**
+//     * 下载整个网页的全部图片
+//     * @param url
+//     */
+//    public void downloadWebPageImages(String url) {
+//
+//        CloseableHttpResponse response = createHttpWithGet(url);
+//
+//        try {
+//            writeImagesToFile(response);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 
     /**
      * 创建网络请求
      * @param url
      * @return
      */
-    private CloseableHttpResponse createHttp(String url) {
+    private CloseableHttpResponse createHttpWithPost(String url) {
 
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeOut);
@@ -576,46 +576,46 @@ public class CrawlerClient {
         return file;
     }
 
-    /**
-     * 将response的响应流写入文件中
-     * @param response
-     * @return
-     * @throws IOException
-     */
-    public void writeImagesToFile(CloseableHttpResponse response) throws IOException{
-
-        // 获取响应实体
-        HttpEntity entity = response.getEntity();
-
-        InputStream is = entity.getContent();
-
-        String html = Utils.inputStream2Str(is);
-
-        Document doc = Jsoup.parse(html);
-
-        Elements media = doc.select("[src]");
-        List<String> urls = new ArrayList<>();
-
-        for (Element src : media) {
-            if (src.tagName().equals("img")) {
-
-                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
-                    System.out.println(src.attr("abs:src"));
-                    urls.add(src.attr("abs:src"));
-                }
-            }
-        }
-
-        if (response != null) {
-            try {
-                EntityUtils.consume(response.getEntity());
-                response.close();
-            } catch (IOException e) {
-                System.err.println("释放链接错误");
-                e.printStackTrace();
-            }
-        }
-
-        downloadPics(urls);
-    }
+//    /**
+//     * 将response的响应流写入文件中
+//     * @param response
+//     * @return
+//     * @throws IOException
+//     */
+//    public void writeImagesToFile(CloseableHttpResponse response) throws IOException{
+//
+//        // 获取响应实体
+//        HttpEntity entity = response.getEntity();
+//
+//        InputStream is = entity.getContent();
+//
+//        String html = Utils.inputStream2Str(is);
+//
+//        Document doc = Jsoup.parse(html);
+//
+//        Elements media = doc.select("[src]");
+//        List<String> urls = new ArrayList<>();
+//
+//        for (Element src : media) {
+//            if (src.tagName().equals("img")) {
+//
+//                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+//                    System.out.println(src.attr("abs:src"));
+//                    urls.add(src.attr("abs:src"));
+//                }
+//            }
+//        }
+//
+//        if (response != null) {
+//            try {
+//                EntityUtils.consume(response.getEntity());
+//                response.close();
+//            } catch (IOException e) {
+//                System.err.println("释放链接错误");
+//                e.printStackTrace();
+//            }
+//        }
+//
+//        downloadPics(urls);
+//    }
  }
