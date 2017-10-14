@@ -4,6 +4,7 @@ import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
+import io.reactivex.functions.Consumer;
 import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
@@ -392,20 +393,35 @@ public class CrawlerClient {
         }
     }
 
-//    /**
-//     * 下载整个网页的全部图片
-//     * @param url
-//     */
-//    public void downloadWebPageImages(String url) {
-//
-//        CloseableHttpResponse response = createHttpWithGet(url);
-//
-//        try {
-//            writeImagesToFile(response);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
+    /**
+     * 下载整个网页的全部图片
+     * @param url
+     */
+    public void downloadWebPageImages(String url) {
+
+        Flowable.just(url)
+                .map(new Function<String, CloseableHttpResponse>() {
+
+                    @Override
+                    public CloseableHttpResponse apply(String s) throws Exception {
+                        return createHttpWithGet(s);
+                    }
+                })
+                .map(new Function<CloseableHttpResponse, List<String>>() {
+
+                    @Override
+                    public List<String> apply(CloseableHttpResponse response) throws Exception {
+
+                        return parseHtmlToImages(response);
+                    }
+                })
+                .subscribe(new Consumer<List<String>>() {
+                    @Override
+                    public void accept(List<String> strings) throws Exception {
+                        downloadPics(strings);
+                    }
+                });
+    }
 
     /**
      * 创建网络请求
@@ -574,46 +590,45 @@ public class CrawlerClient {
         return file;
     }
 
-//    /**
-//     * 将response的响应流写入文件中
-//     * @param response
-//     * @return
-//     * @throws IOException
-//     */
-//    public void writeImagesToFile(CloseableHttpResponse response) throws IOException{
-//
-//        // 获取响应实体
-//        HttpEntity entity = response.getEntity();
-//
-//        InputStream is = entity.getContent();
-//
-//        String html = Utils.inputStream2Str(is);
-//
-//        Document doc = Jsoup.parse(html);
-//
-//        Elements media = doc.select("[src]");
-//        List<String> urls = new ArrayList<>();
-//
-//        for (Element src : media) {
-//            if (src.tagName().equals("img")) {
-//
-//                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
-//                    System.out.println(src.attr("abs:src"));
-//                    urls.add(src.attr("abs:src"));
-//                }
-//            }
-//        }
-//
-//        if (response != null) {
-//            try {
-//                EntityUtils.consume(response.getEntity());
-//                response.close();
-//            } catch (IOException e) {
-//                System.err.println("释放链接错误");
-//                e.printStackTrace();
-//            }
-//        }
-//
-//        downloadPics(urls);
-//    }
+    private List<String> parseHtmlToImages(CloseableHttpResponse response) {
+
+        // 获取响应实体
+        HttpEntity entity = response.getEntity();
+
+        InputStream is = null;
+        try {
+            is = entity.getContent();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        String html = Utils.inputStream2Str(is);
+
+        Document doc = Jsoup.parse(html);
+
+        Elements media = doc.select("[src]");
+        List<String> urls = new ArrayList<>();
+
+        for (Element src : media) {
+            if (src.tagName().equals("img")) {
+
+                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+//                                    System.out.println(src.attr("abs:src"));
+                    urls.add(src.attr("abs:src"));
+                }
+            }
+        }
+
+        if (response != null) {
+            try {
+                EntityUtils.consume(response.getEntity());
+                response.close();
+            } catch (IOException e) {
+                System.err.println("释放链接错误");
+                e.printStackTrace();
+            }
+        }
+
+        return urls;
+    }
  }
