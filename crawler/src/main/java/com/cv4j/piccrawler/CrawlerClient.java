@@ -262,10 +262,8 @@ public class CrawlerClient {
      */
     private void doDownloadPic(String url) {
 
-        CloseableHttpResponse response = createHttpWithPost(url);
-
         try {
-            writeImageToFile(response);
+            writeImageToFile(createHttpWithPost(url));
         } catch (IOException e) {
             e.printStackTrace();
         }
