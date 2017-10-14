@@ -4,8 +4,6 @@ import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
@@ -44,7 +42,6 @@ import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
-
 
 /**
  * Created by tony on 2017/9/11.
@@ -296,10 +293,27 @@ public class CrawlerClient {
 
         if (repeat==1) {
 
-            return Flowable.create(new FlowableOnSubscribe<String>() {
+            return Flowable.create((FlowableEmitter<String> e) -> {
 
-                @Override
-                public void subscribe(FlowableEmitter<String> e) throws Exception {
+                if (sleepTime>0) {
+
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+
+                e.onNext(url);
+
+            }, BackpressureStrategy.BUFFER)
+                    .map(s->createHttpWithPost(s))
+                    .map(response->writeImageToFile(response));
+
+        } else if (repeat>1) {
+            return Flowable.create((FlowableEmitter<String> e) -> {
+
+                for (int i = 0; i < repeat; i++) {
 
                     if (sleepTime>0) {
 
@@ -312,30 +326,7 @@ public class CrawlerClient {
 
                     e.onNext(url);
                 }
-            }, BackpressureStrategy.BUFFER)
-                    .map(s->createHttpWithPost(s))
-                    .map(response->writeImageToFile(response));
 
-        } else if (repeat>1) {
-            return Flowable.create(new FlowableOnSubscribe<String>() {
-
-                @Override
-                public void subscribe(FlowableEmitter<String> e) throws Exception {
-
-                    for (int i = 0; i < repeat; i++) {
-
-                        if (sleepTime>0) {
-
-                            try {
-                                Thread.sleep(sleepTime);
-                            } catch (InterruptedException exception) {
-                                exception.printStackTrace();
-                            }
-                        }
-
-                        e.onNext(url);
-                    }
-                }
             }, BackpressureStrategy.BUFFER)
                     .map(s->createHttpWithPost(s))
                     .observeOn(Schedulers.io())
