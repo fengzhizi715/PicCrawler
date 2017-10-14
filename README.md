@@ -19,7 +19,7 @@ repositories {
 Gradle:
 
 ```groovy
-compile 'com.cv4j.piccrawler:crawler:0.0.2'
+compile 'com.cv4j.piccrawler:crawler:0.0.3'
 ```
 
 
@@ -29,12 +29,13 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.0.2</version>
+  <version>0.0.3</version>
   <type>pom</type>
 </dependency>
 ```
 
 # 使用方法：
+## 1.1 下载单个图片
 1. 普通方式
 
 ```java
@@ -126,5 +127,29 @@ Maven:
                 });
 ```
 
-稍后，我会加上支持抓取多个图片url的方法。
+## 1.2 下载多张图片
+```java
+        List<String> urls = ...; // 多张图片的地址的集合
+        CrawlerClient.get()
+                .timeOut(6000)
+                .fileStrategy(new FileStrategy() {
+
+                    @Override
+                    public String filePath() {
+                        return "temp";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.AUTO_INCREMENT;
+                    }
+                })
+                .downloadPics(urls);
+```
 
