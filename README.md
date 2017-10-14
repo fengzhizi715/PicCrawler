@@ -35,7 +35,7 @@ Maven:
 ```
 
 # 使用方法：
-## 1.1 下载单个图片
+## 1.1 下载单张图片
 1. 普通方式
 
 ```java
@@ -129,7 +129,7 @@ Maven:
 
 ## 1.2 下载多张图片
 ```java
-        List<String> urls = ...; // 多张图片的地址的集合
+        List<String> urls = ...; // 多张图片地址的集合
         CrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
