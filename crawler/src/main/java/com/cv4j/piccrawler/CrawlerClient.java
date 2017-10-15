@@ -59,6 +59,7 @@ public class CrawlerClient {
     private int repeat = 1;
     private int sleepTime = 0;
     private String userAgent;
+    private String referer;
     private FileStrategy fileStrategy;
     private HttpHost proxy;
 
@@ -127,6 +128,16 @@ public class CrawlerClient {
     public CrawlerClient ua(String userAgent) {
 
         this.userAgent = userAgent;
+        return this;
+    }
+
+    /**
+     * @param referer
+     * @return
+     */
+    public CrawlerClient referer(String referer) {
+
+        this.referer = referer;
         return this;
     }
 
@@ -380,6 +391,14 @@ public class CrawlerClient {
         // 创建Post请求对象
         HttpPost httpPost = new HttpPost(url);
 
+        if (Preconditions.isNotBlank(userAgent)) {
+            httpPost.addHeader("User-Agent",userAgent);
+        }
+
+        if (Preconditions.isNotBlank(referer)) {
+            httpPost.addHeader("Referer",referer);
+        }
+
         CloseableHttpResponse response = null;
 
         // 执行请求
@@ -401,6 +420,10 @@ public class CrawlerClient {
 
         if (Preconditions.isNotBlank(userAgent)) {
             httpGet.addHeader("User-Agent",userAgent);
+        }
+
+        if (Preconditions.isNotBlank(referer)) {
+            httpGet.addHeader("Referer",referer);
         }
 
         CloseableHttpResponse response = null;
