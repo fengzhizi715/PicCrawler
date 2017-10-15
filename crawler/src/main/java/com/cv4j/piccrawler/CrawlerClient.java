@@ -7,6 +7,7 @@ import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
+import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -19,9 +20,12 @@ import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.socket.PlainConnectionSocketFactory;
 import org.apache.http.conn.ssl.NoopHostnameVerifier;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
+import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -62,6 +66,7 @@ public class CrawlerClient {
     private String referer;
     private FileStrategy fileStrategy;
     private HttpHost proxy;
+    private BasicClientCookie cookie;
 
     /**
      * 配置连接池信息，支持http/https
@@ -199,6 +204,17 @@ public class CrawlerClient {
     }
 
     /**
+     *
+     * @param cookie 设置浏览器的cookie
+     * @return
+     */
+    public CrawlerClient cookie(BasicClientCookie cookie) {
+
+        this.cookie = cookie;
+        return this;
+    }
+
+    /**
      * 获取Http客户端连接对象
      *
      * @param timeOut 超时时间
@@ -207,38 +223,38 @@ public class CrawlerClient {
     private CloseableHttpClient getHttpClient(int timeOut) {
 
         // 创建Http请求配置参数
-        RequestConfig requestConfig = null;
+        RequestConfig.Builder builder = RequestConfig.custom()
+                    // 获取连接超时时间
+                    .setConnectionRequestTimeout(timeOut)
+                    // 请求超时时间
+                    .setConnectTimeout(timeOut)
+                    // 响应超时时间
+                    .setSocketTimeout(timeOut);
 
         if (proxy!=null) {
-            requestConfig = RequestConfig.custom()
-                    // 获取连接超时时间
-                    .setConnectionRequestTimeout(timeOut)
-                    // 请求超时时间
-                    .setConnectTimeout(timeOut)
-                    // 响应超时时间
-                    .setSocketTimeout(timeOut)
-                    .setProxy(proxy)
-                    .build();
-        } else {
-            requestConfig = RequestConfig.custom()
-                    // 获取连接超时时间
-                    .setConnectionRequestTimeout(timeOut)
-                    // 请求超时时间
-                    .setConnectTimeout(timeOut)
-                    // 响应超时时间
-                    .setSocketTimeout(timeOut)
-                    .build();
+            builder.setProxy(proxy);
         }
 
+        RequestConfig requestConfig = builder.build();
+
         // 创建httpClient
-        return HttpClients.custom()
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+
+        httpClientBuilder
                 // 把请求相关的超时信息设置到连接客户端
                 .setDefaultRequestConfig(requestConfig)
                 // 把请求重试设置到连接客户端
                 .setRetryHandler(new RetryHandler())
                 // 配置连接池管理对象
-                .setConnectionManager(connManager)
-                .build();
+                .setConnectionManager(connManager);
+
+        if (cookie!=null) {
+            CookieStore cookieStore = new BasicCookieStore();
+            cookieStore.addCookie(cookie);
+            httpClientBuilder.setDefaultCookieStore(cookieStore);
+        }
+
+        return httpClientBuilder.build();
     }
 
     /**
