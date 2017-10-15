@@ -40,9 +40,7 @@ import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -67,6 +65,7 @@ public class CrawlerClient {
     private FileStrategy fileStrategy;
     private HttpHost proxy;
     private BasicClientCookie cookie;
+    private Map<String,String> header = new HashMap<>();
 
     /**
      * 配置连接池信息，支持http/https
@@ -211,6 +210,18 @@ public class CrawlerClient {
     public CrawlerClient cookie(BasicClientCookie cookie) {
 
         this.cookie = cookie;
+        return this;
+    }
+
+    /**
+     *
+     * @param name
+     * @param value
+     * @return
+     */
+    public CrawlerClient addHeader(String name,String value) {
+
+        header.put(name,value);
         return this;
     }
 
@@ -415,6 +426,10 @@ public class CrawlerClient {
             httpPost.addHeader("Referer",referer);
         }
 
+        for (String key : header.keySet()) {
+            httpPost.addHeader(key,header.get(key));
+        }
+
         CloseableHttpResponse response = null;
 
         // 执行请求
@@ -440,6 +455,10 @@ public class CrawlerClient {
 
         if (Preconditions.isNotBlank(referer)) {
             httpGet.addHeader("Referer",referer);
+        }
+
+        for (String key : header.keySet()) {
+            httpGet.addHeader(key,header.get(key));
         }
 
         CloseableHttpResponse response = null;
