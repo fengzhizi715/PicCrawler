@@ -19,7 +19,7 @@ repositories {
 Gradle:
 
 ```groovy
-compile 'com.cv4j.piccrawler:crawler:0.0.3'
+compile 'com.cv4j.piccrawler:crawler:0.0.5'
 ```
 
 
@@ -29,7 +29,7 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.0.3</version>
+  <version>0.0.5</version>
   <type>pom</type>
 </dependency>
 ```
