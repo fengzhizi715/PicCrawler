@@ -2,6 +2,7 @@ package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
+import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
@@ -559,8 +560,8 @@ public class CrawlerClient {
             bos.write(byt, 0, len);
         }
 
-        bos.close();
-        bis.close();
+        IOUtils.closeQuietly(bos);
+        IOUtils.closeQuietly(bis);
 
         if (response != null) {
             try {
