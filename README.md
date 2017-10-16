@@ -155,7 +155,7 @@ Maven:
 
 ## 1.3 下载某个网页的全部图片
 ```java
-        String url = "..."; // 图片的地址
+        String url = "..."; // 针对某一个网址
         CrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
