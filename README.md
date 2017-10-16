@@ -19,7 +19,7 @@ repositories {
 Gradle:
 
 ```groovy
-compile 'com.cv4j.piccrawler:crawler:0.0.5'
+compile 'com.cv4j.piccrawler:crawler:0.0.6'
 ```
 
 
@@ -29,7 +29,7 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.0.5</version>
+  <version>0.0.6</version>
   <type>pom</type>
 </dependency>
 ```
@@ -153,3 +153,28 @@ Maven:
                 .downloadPics(urls);
 ```
 
+## 1.3 下载某个网页的全部图片
+```java
+        String url = "..."; // 图片的地址
+        CrawlerClient.get()
+                .timeOut(6000)
+                .fileStrategy(new FileStrategy() {
+
+                    @Override
+                    public String filePath() {
+                        return "temp";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.AUTO_INCREMENT;
+                    }
+                })
+                .downloadWebPageImages(url);
+```
