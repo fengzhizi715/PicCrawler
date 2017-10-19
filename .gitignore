@@ -8,3 +8,5 @@
 build/
 gradlew
 gradlew.bat
+
+log/
