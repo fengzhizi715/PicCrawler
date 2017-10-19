@@ -18,6 +18,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.*;
@@ -30,6 +32,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CrawlerClient {
 
+    Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
+
     private static AtomicInteger count = new AtomicInteger();
     private final static int BUFFER_SIZE = 0x2000; // 8192
 
@@ -41,7 +45,7 @@ public class CrawlerClient {
     private BasicClientCookie cookie;
     private Map<String,String> header = new HashMap<>();
     private HttpManager httpManager;
-
+    private CloseableHttpClient httpClient;
 
     private CrawlerClient() {
 
@@ -175,6 +179,8 @@ public class CrawlerClient {
                 }
             }
 
+            logger.info(url);
+
             doDownloadPic(url);
         }
     }
@@ -302,7 +308,7 @@ public class CrawlerClient {
     private CloseableHttpResponse createHttpWithPost(String url) {
 
         // 获取客户端连接对象
-        CloseableHttpClient httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
+        CloseableHttpClient httpClient = getHttpClient();
         // 创建Post请求对象
         HttpPost httpPost = new HttpPost(url);
 
@@ -327,7 +333,7 @@ public class CrawlerClient {
     private CloseableHttpResponse createHttpWithGet(String url) {
 
         // 获取客户端连接对象
-        CloseableHttpClient httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
+        CloseableHttpClient httpClient = getHttpClient();
         // 创建Get请求对象
         HttpGet httpGet = new HttpGet(url);
 
@@ -494,6 +500,7 @@ public class CrawlerClient {
 
                 if (Preconditions.isNotBlank(src.attr("abs:src"))) {
 
+                    logger.info(src.attr("abs:src"));
                     urls.add(src.attr("abs:src"));
                 }
             }
@@ -510,5 +517,14 @@ public class CrawlerClient {
         }
 
         return urls;
+    }
+
+    private CloseableHttpClient getHttpClient() {
+
+        if (httpClient!=null) return httpClient;
+
+        httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
+
+        return httpClient;
     }
  }

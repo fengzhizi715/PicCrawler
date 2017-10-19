@@ -37,9 +37,6 @@ class HttpManager {
      */
     private static PoolingHttpClientConnectionManager connManager = null;
 
-
-    private CloseableHttpClient closeableHttpClient;
-
     /**
      * 配置连接池信息，支持http/https
      */
@@ -87,6 +84,17 @@ class HttpManager {
         }
     }
 
+    private HttpManager() {
+    }
+
+    public static HttpManager get() {
+        return HttpManager.Holder.MANAGER;
+    }
+
+    private static class Holder {
+        private static final HttpManager MANAGER = new HttpManager();
+    }
+
     /**
      * 获取Http客户端连接对象
      * @param timeOut 超时时间
@@ -95,8 +103,6 @@ class HttpManager {
      * @return Http客户端连接对象
      */
     public CloseableHttpClient getHttpClient(int timeOut,HttpHost proxy,BasicClientCookie cookie) {
-
-        if (closeableHttpClient!=null) return closeableHttpClient;
 
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()
@@ -130,19 +136,6 @@ class HttpManager {
             httpClientBuilder.setDefaultCookieStore(cookieStore);
         }
 
-        closeableHttpClient = httpClientBuilder.build();
-
-        return closeableHttpClient;
-    }
-
-    private HttpManager() {
-    }
-
-    public static HttpManager get() {
-        return HttpManager.Holder.MANAGER;
-    }
-
-    private static class Holder {
-        private static final HttpManager MANAGER = new HttpManager();
+        return httpClientBuilder.build();
     }
 }
