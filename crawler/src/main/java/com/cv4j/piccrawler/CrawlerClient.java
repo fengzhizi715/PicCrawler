@@ -66,6 +66,8 @@ public class CrawlerClient {
     private BasicClientCookie cookie;
     private Map<String,String> header = new HashMap<>();
 
+    private CloseableHttpClient closeableHttpClient;
+
     /**
      * 配置连接池信息，支持http/https
      */
@@ -232,6 +234,8 @@ public class CrawlerClient {
      */
     private CloseableHttpClient getHttpClient(int timeOut) {
 
+        if (closeableHttpClient!=null) return closeableHttpClient;
+
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()
                     // 获取连接超时时间
@@ -264,7 +268,9 @@ public class CrawlerClient {
             httpClientBuilder.setDefaultCookieStore(cookieStore);
         }
 
-        return httpClientBuilder.build();
+        closeableHttpClient = httpClientBuilder.build();
+
+        return closeableHttpClient;
     }
 
     /**
