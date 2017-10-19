@@ -8,24 +8,10 @@ import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
-import org.apache.http.client.CookieStore;
-import org.apache.http.client.config.AuthSchemes;
-import org.apache.http.client.config.CookieSpecs;
-import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.config.Registry;
-import org.apache.http.config.RegistryBuilder;
-import org.apache.http.conn.socket.ConnectionSocketFactory;
-import org.apache.http.conn.socket.PlainConnectionSocketFactory;
-import org.apache.http.conn.ssl.NoopHostnameVerifier;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -33,14 +19,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import java.io.*;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.CertificateException;
-import java.security.cert.X509Certificate;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -51,10 +30,6 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CrawlerClient {
 
-    /**
-     * 全局连接池对象
-     */
-    private static PoolingHttpClientConnectionManager connManager = null;
     private static AtomicInteger count = new AtomicInteger();
     private final static int BUFFER_SIZE = 0x2000; // 8192
 
@@ -65,57 +40,12 @@ public class CrawlerClient {
     private HttpHost proxy;
     private BasicClientCookie cookie;
     private Map<String,String> header = new HashMap<>();
+    private HttpManager httpManager;
 
-    private CloseableHttpClient closeableHttpClient;
-
-    /**
-     * 配置连接池信息，支持http/https
-     */
-    static {
-        SSLContext sslcontext = null;
-        try {
-            //获取TLS安全协议上下文
-            sslcontext = SSLContext.getInstance("TLS");
-            sslcontext.init(null, new TrustManager[]{new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(X509Certificate[] arg0, String arg1)
-                        throws CertificateException {
-                }
-
-                @Override
-                public void checkServerTrusted(X509Certificate[] arg0, String arg1)
-                        throws CertificateException {
-                }
-
-                @Override
-                public X509Certificate[] getAcceptedIssuers() {
-                    return new X509Certificate[]{};
-                }
-            }}, null);
-
-            SSLConnectionSocketFactory scsf = new SSLConnectionSocketFactory(sslcontext, NoopHostnameVerifier.INSTANCE);
-            RequestConfig defaultConfig = RequestConfig.custom().setCookieSpec(CookieSpecs.STANDARD_STRICT)
-                    .setExpectContinueEnabled(true)
-                    .setTargetPreferredAuthSchemes(Arrays.asList(AuthSchemes.NTLM, AuthSchemes.DIGEST))
-                    .setProxyPreferredAuthSchemes(Arrays.asList(AuthSchemes.BASIC)).build();
-            Registry<ConnectionSocketFactory> sfr = RegistryBuilder.<ConnectionSocketFactory>create()
-                    .register("http", PlainConnectionSocketFactory.INSTANCE)
-                    .register("https", scsf).build();
-
-            connManager = new PoolingHttpClientConnectionManager(sfr);
-
-            // 设置最大连接数
-            connManager.setMaxTotal(200);
-            // 设置每个连接的路由数
-            connManager.setDefaultMaxPerRoute(20);
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (KeyManagementException e) {
-            e.printStackTrace();
-        }
-    }
 
     private CrawlerClient() {
+
+        httpManager = HttpManager.get();
     }
 
     public static CrawlerClient get() {
@@ -224,53 +154,6 @@ public class CrawlerClient {
 
         header.put(name,value);
         return this;
-    }
-
-    /**
-     * 获取Http客户端连接对象
-     *
-     * @param timeOut 超时时间
-     * @return Http客户端连接对象
-     */
-    private CloseableHttpClient getHttpClient(int timeOut) {
-
-        if (closeableHttpClient!=null) return closeableHttpClient;
-
-        // 创建Http请求配置参数
-        RequestConfig.Builder builder = RequestConfig.custom()
-                    // 获取连接超时时间
-                    .setConnectionRequestTimeout(timeOut)
-                    // 请求超时时间
-                    .setConnectTimeout(timeOut)
-                    // 响应超时时间
-                    .setSocketTimeout(timeOut);
-
-        if (proxy!=null) {
-            builder.setProxy(proxy);
-        }
-
-        RequestConfig requestConfig = builder.build();
-
-        // 创建httpClient
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
-
-        httpClientBuilder
-                // 把请求相关的超时信息设置到连接客户端
-                .setDefaultRequestConfig(requestConfig)
-                // 把请求重试设置到连接客户端
-                .setRetryHandler(new RetryHandler())
-                // 配置连接池管理对象
-                .setConnectionManager(connManager);
-
-        if (cookie!=null) {
-            CookieStore cookieStore = new BasicCookieStore();
-            cookieStore.addCookie(cookie);
-            httpClientBuilder.setDefaultCookieStore(cookieStore);
-        }
-
-        closeableHttpClient = httpClientBuilder.build();
-
-        return closeableHttpClient;
     }
 
     /**
@@ -419,12 +302,14 @@ public class CrawlerClient {
     private CloseableHttpResponse createHttpWithPost(String url) {
 
         // 获取客户端连接对象
-        CloseableHttpClient httpClient = getHttpClient(timeOut);
+        CloseableHttpClient httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
         // 创建Post请求对象
         HttpPost httpPost = new HttpPost(url);
 
-        for (String key : header.keySet()) {
-            httpPost.setHeader(key,header.get(key));
+        if (Preconditions.isNotBlank(header)) {
+            for (String key : header.keySet()) {
+                httpPost.setHeader(key,header.get(key));
+            }
         }
 
         CloseableHttpResponse response = null;
@@ -442,12 +327,14 @@ public class CrawlerClient {
     private CloseableHttpResponse createHttpWithGet(String url) {
 
         // 获取客户端连接对象
-        CloseableHttpClient httpClient = getHttpClient(timeOut);
+        CloseableHttpClient httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
         // 创建Get请求对象
         HttpGet httpGet = new HttpGet(url);
 
-        for (String key : header.keySet()) {
-            httpGet.setHeader(key,header.get(key));
+        if (Preconditions.isNotBlank(header)) {
+            for (String key : header.keySet()) {
+                httpGet.setHeader(key,header.get(key));
+            }
         }
 
         CloseableHttpResponse response = null;
