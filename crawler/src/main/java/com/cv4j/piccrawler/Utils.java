@@ -1,17 +1,6 @@
 package com.cv4j.piccrawler;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.util.EntityUtils;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
-
-import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
 
 /**
@@ -34,22 +23,6 @@ public class Utils {
      */
     public static String randomUUID() {
         return UUID.randomUUID().toString().replace("-", "");
-    }
-
-
-    public static String inputStream2Str(InputStream in) {
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        byte[] b = new byte[1024];
-        int len = 0;
-        try {
-            while ((len = in.read(b)) > 0) {
-                out.write(b, 0, len);
-            }
-            return out.toString("utf-8");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return "";
     }
 
     /**

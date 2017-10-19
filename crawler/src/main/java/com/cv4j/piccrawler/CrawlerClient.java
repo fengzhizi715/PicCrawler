@@ -582,13 +582,14 @@ public class CrawlerClient {
         HttpEntity entity = response.getEntity();
 
         InputStream is = null;
+        String html = null;
+
         try {
             is = entity.getContent();
+            html = IOUtils.inputStream2String(is);
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-        String html = Utils.inputStream2Str(is);
 
         Document doc = Jsoup.parse(html);
 
