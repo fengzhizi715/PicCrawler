@@ -1,12 +1,19 @@
 package com.cv4j.piccrawler;
 
-import java.io.File;
+import com.cv4j.piccrawler.proxy.domain.Proxy;
+import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.*;
 import java.util.UUID;
 
 /**
  * Created by tony on 2017/10/10.
  */
 public class Utils {
+
+    static Logger logger=  LoggerFactory.getLogger(Utils.class);
 
     /**
      * 生成随机数<br>
@@ -37,5 +44,63 @@ public class Utils {
         }
 
         return directory;
+    }
+
+    /**
+     * 序列化对象
+     * @param object
+     * @throws Exception
+     */
+    public static void serializeObject(Object object,String filePath){
+        OutputStream fos = null;
+        try {
+            fos = new FileOutputStream(filePath, false);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(object);
+            logger.info("序列化成功");
+            oos.flush();
+            fos.close();
+            oos.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 反序列化对象
+     * @param path
+     * @throws Exception
+     */
+    public static Object deserializeObject(String path) throws Exception {
+
+        File file = new File(path);
+        InputStream fis = new FileInputStream(file);
+        ObjectInputStream ois = null;
+        Object object = null;
+        ois = new ObjectInputStream(fis);
+        object = ois.readObject();
+        fis.close();
+        ois.close();
+        return object;
+    }
+
+    /**
+     * 是否丢弃代理
+     * 失败次数大于３，且失败率超过60%，丢弃
+     */
+    public static boolean isDiscardProxy(Proxy proxy){
+
+        int succTimes = proxy.getSuccessfulTimes();
+        int failTimes = proxy.getFailureTimes();
+
+        if(failTimes >= 3){
+            double failRate = (failTimes + 0.0) / (succTimes + failTimes);
+            if (failRate > 0.6){
+                return true;
+            }
+        }
+        return false;
     }
 }

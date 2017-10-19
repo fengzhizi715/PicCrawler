@@ -5,6 +5,10 @@ import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpRequestBase;
+import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -21,16 +25,18 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Random;
 
 /**
  * Created by tony on 2017/10/19.
  */
-class HttpManager {
+public class HttpManager {
 
     /**
      * 全局连接池对象
@@ -137,5 +143,59 @@ class HttpManager {
         }
 
         return httpClientBuilder.build();
+    }
+
+    private CloseableHttpClient getHttpClient() {
+
+        // 创建Http请求配置参数
+        RequestConfig.Builder builder = RequestConfig.custom()
+                // 获取连接超时时间
+                .setConnectionRequestTimeout(20000)
+                // 请求超时时间
+                .setConnectTimeout(20000)
+                // 响应超时时间
+                .setSocketTimeout(20000);
+
+        RequestConfig requestConfig = builder.build();
+
+        // 创建httpClient
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+
+        httpClientBuilder
+                // 把请求相关的超时信息设置到连接客户端
+                .setDefaultRequestConfig(requestConfig)
+                // 把请求重试设置到连接客户端
+                .setRetryHandler(new RetryHandler())
+                // 配置连接池管理对象
+                .setConnectionManager(connManager);
+
+        return httpClientBuilder.build();
+    }
+
+    public CloseableHttpResponse getResponse(String url) {
+
+        HttpGet request = new HttpGet(url);
+        return getResponse(request);
+    }
+
+    public CloseableHttpResponse getResponse(HttpRequestBase request) {
+
+        request.setHeader("User-Agent", Constant.userAgentArray[new Random().nextInt(Constant.userAgentArray.length)]);
+        HttpClientContext httpClientContext = HttpClientContext.create();
+        CloseableHttpResponse response = null;
+        try {
+            response = getHttpClient().execute(request, httpClientContext);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public org.apache.http.client.config.RequestConfig.Builder getRequestConfigBuilder(){
+        return RequestConfig.custom().setSocketTimeout(20000).
+                setConnectTimeout(20000).
+                setConnectionRequestTimeout(20000).
+                setCookieSpec(CookieSpecs.STANDARD);
     }
 }
