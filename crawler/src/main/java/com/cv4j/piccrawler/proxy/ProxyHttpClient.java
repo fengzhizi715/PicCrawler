@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class ProxyHttpClient {
 
-    Logger logger=  LoggerFactory.getLogger(ProxyHttpClient.class);
+    private Logger logger=  LoggerFactory.getLogger(ProxyHttpClient.class);
 
     public static Set<Page> downloadFailureProxyPageSet = new HashSet<>(ProxyPool.proxyMap.size());
 

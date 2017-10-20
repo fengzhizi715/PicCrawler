@@ -145,7 +145,11 @@ public class HttpManager {
         return httpClientBuilder.build();
     }
 
-    private CloseableHttpClient getHttpClient() {
+    /**
+     * 创建新的HttpClient
+     * @return
+     */
+    private CloseableHttpClient createHttpClient() {
 
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()
@@ -184,7 +188,7 @@ public class HttpManager {
         HttpClientContext httpClientContext = HttpClientContext.create();
         CloseableHttpResponse response = null;
         try {
-            response = getHttpClient().execute(request, httpClientContext);
+            response = createHttpClient().execute(request, httpClientContext);
         } catch (IOException e) {
             e.printStackTrace();
         }

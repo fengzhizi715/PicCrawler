@@ -25,7 +25,7 @@ import static com.cv4j.piccrawler.proxy.ProxyPool.proxyQueue;
  */
 public class ProxyPageTask implements Runnable {
 
-    Logger logger=  LoggerFactory.getLogger(ProxyPageTask.class);
+    private Logger logger =  LoggerFactory.getLogger(ProxyPageTask.class);
 
     protected String url;
     private boolean proxyFlag;//是否通过代理下载
