@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler;
 
 /**
+ * 生成文件名的枚举方法
  * Created by tony on 2017/10/10.
  */
 

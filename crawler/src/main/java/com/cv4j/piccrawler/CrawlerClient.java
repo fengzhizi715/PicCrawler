@@ -524,7 +524,7 @@ public class CrawlerClient {
 
         if (httpClient!=null) return httpClient;
 
-        httpClient = httpManager.getHttpClient(timeOut,proxy,cookie);
+        httpClient = httpManager.createHttpClient(timeOut,proxy,cookie);
 
         return httpClient;
     }
