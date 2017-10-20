@@ -108,7 +108,7 @@ public class HttpManager {
      * @param cookie  Cookie
      * @return Http客户端连接对象
      */
-    public CloseableHttpClient getHttpClient(int timeOut,HttpHost proxy,BasicClientCookie cookie) {
+    public CloseableHttpClient createHttpClient(int timeOut,HttpHost proxy,BasicClientCookie cookie) {
 
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()

@@ -447,6 +447,8 @@ public class CrawlerClient {
                 break;
         }
 
+        if (Preconditions.isBlank(fileName)) fileName = "temp";
+
         File file = new File(directory, fileName + "." + format);
 
         BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
