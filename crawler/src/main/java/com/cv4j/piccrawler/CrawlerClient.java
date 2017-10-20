@@ -179,8 +179,6 @@ public class CrawlerClient {
                 }
             }
 
-            logger.info(url);
-
             doDownloadPic(url);
         }
     }
@@ -495,13 +493,16 @@ public class CrawlerClient {
         Elements media = doc.select("[src]");
         List<String> urls = new ArrayList<>();
 
-        for (Element src : media) {
-            if (src.tagName().equals("img")) {
+        if (Preconditions.isNotBlank(media)) {
 
-                if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+            for (Element src : media) {
+                if (src.tagName().equals("img")) {
 
-                    logger.info(src.attr("abs:src"));
-                    urls.add(src.attr("abs:src"));
+                    if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+
+                        logger.info(src.attr("abs:src"));
+                        urls.add(src.attr("abs:src"));
+                    }
                 }
             }
         }
