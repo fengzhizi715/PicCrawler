@@ -32,7 +32,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class CrawlerClient {
 
-    Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
+    private Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
 
     private static AtomicInteger count = new AtomicInteger();
     private final static int BUFFER_SIZE = 0x2000; // 8192
