@@ -102,6 +102,15 @@ public class HttpManager {
     }
 
     /**
+     * 创建新的HttpClient
+     * @return
+     */
+    public CloseableHttpClient createHttpClient() {
+
+        return createHttpClient(20000,null,null);
+    }
+
+    /**
      * 获取Http客户端连接对象
      * @param timeOut 超时时间
      * @param proxy   代理
@@ -141,37 +150,6 @@ public class HttpManager {
             cookieStore.addCookie(cookie);
             httpClientBuilder.setDefaultCookieStore(cookieStore);
         }
-
-        return httpClientBuilder.build();
-    }
-
-    /**
-     * 创建新的HttpClient
-     * @return
-     */
-    private CloseableHttpClient createHttpClient() {
-
-        // 创建Http请求配置参数
-        RequestConfig.Builder builder = RequestConfig.custom()
-                // 获取连接超时时间
-                .setConnectionRequestTimeout(20000)
-                // 请求超时时间
-                .setConnectTimeout(20000)
-                // 响应超时时间
-                .setSocketTimeout(20000);
-
-        RequestConfig requestConfig = builder.build();
-
-        // 创建httpClient
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
-
-        httpClientBuilder
-                // 把请求相关的超时信息设置到连接客户端
-                .setDefaultRequestConfig(requestConfig)
-                // 把请求重试设置到连接客户端
-                .setRetryHandler(new RetryHandler())
-                // 配置连接池管理对象
-                .setConnectionManager(connManager);
 
         return httpClientBuilder.build();
     }
