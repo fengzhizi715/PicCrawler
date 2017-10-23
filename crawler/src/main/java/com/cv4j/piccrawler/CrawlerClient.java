@@ -6,6 +6,7 @@ import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
 import io.reactivex.schedulers.Schedulers;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -30,9 +31,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by tony on 2017/9/11.
  */
+@Slf4j
 public class CrawlerClient {
 
-    private Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
+//    private Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
 
     private static AtomicInteger count = new AtomicInteger();
     private final static int BUFFER_SIZE = 0x2000; // 8192
@@ -502,7 +504,7 @@ public class CrawlerClient {
 
                     if (Preconditions.isNotBlank(src.attr("abs:src"))) {
 
-                        logger.info(src.attr("abs:src"));
+                        log.info(src.attr("abs:src"));
                         urls.add(src.attr("abs:src"));
                     }
                 }
