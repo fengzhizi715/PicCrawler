@@ -184,7 +184,31 @@ public class HttpManager {
 
     public boolean checkProxy(HttpHost proxy) {
 
-        CloseableHttpClient client = createHttpClient(20000,proxy,null);
+        // 创建Http请求配置参数
+        RequestConfig.Builder builder = RequestConfig.custom()
+                // 获取连接超时时间
+                .setConnectionRequestTimeout(20000)
+                // 请求超时时间
+                .setConnectTimeout(20000)
+                // 响应超时时间
+                .setSocketTimeout(20000);
+
+        if (proxy!=null) {
+            builder.setProxy(proxy);
+        }
+
+        RequestConfig requestConfig = builder.build();
+
+        // 创建httpClient
+        HttpClientBuilder httpClientBuilder = HttpClients.custom();
+
+        httpClientBuilder
+                // 把请求相关的超时信息设置到连接客户端
+                .setDefaultRequestConfig(requestConfig)
+                // 配置连接池管理对象
+                .setConnectionManager(connManager);
+
+        CloseableHttpClient client =  httpClientBuilder.build();
 
         HttpClientContext httpClientContext = HttpClientContext.create();
         CloseableHttpResponse response = null;

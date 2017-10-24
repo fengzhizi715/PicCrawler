@@ -1,14 +1,11 @@
 package com.cv4j.piccrawler;
 
-import lombok.extern.slf4j.Slf4j;
-
 import java.io.*;
 import java.util.UUID;
 
 /**
  * Created by tony on 2017/10/10.
  */
-@Slf4j
 public class Utils {
 
     /**
@@ -40,45 +37,5 @@ public class Utils {
         }
 
         return directory;
-    }
-
-    /**
-     * 序列化对象
-     * @param object
-     * @throws Exception
-     */
-    public static void serializeObject(Object object,String filePath){
-        OutputStream fos = null;
-        try {
-            fos = new FileOutputStream(filePath, false);
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(object);
-            log.info("序列化成功");
-            oos.flush();
-            fos.close();
-            oos.close();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    /**
-     * 反序列化对象
-     * @param path
-     * @throws Exception
-     */
-    public static Object deserializeObject(String path) throws Exception {
-
-        File file = new File(path);
-        InputStream fis = new FileInputStream(file);
-        ObjectInputStream ois = null;
-        Object object = null;
-        ois = new ObjectInputStream(fis);
-        object = ois.readObject();
-        fis.close();
-        ois.close();
-        return object;
     }
 }

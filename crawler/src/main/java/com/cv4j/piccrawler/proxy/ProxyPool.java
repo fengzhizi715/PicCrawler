@@ -51,6 +51,10 @@ public class ProxyPool {
 
     public static Proxy getRandomProxy() {
 
-        return RandomUtils.getRandomElement(proxySet);
+        ProxyPool.lock.writeLock().lock();
+        Proxy proxy = RandomUtils.getRandomElement(proxySet);
+        ProxyPool.lock.writeLock().unlock();
+
+        return proxy;
     }
 }
