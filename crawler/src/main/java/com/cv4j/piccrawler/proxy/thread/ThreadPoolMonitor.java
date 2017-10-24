@@ -1,8 +1,7 @@
 package com.cv4j.piccrawler.proxy.thread;
 
+import com.cv4j.piccrawler.proxy.ProxyHttpClient;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.concurrent.ThreadPoolExecutor;
 
@@ -14,8 +13,8 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ThreadPoolMonitor implements Runnable {
 
     private ThreadPoolExecutor executor;
-    private String name = "";
     public static volatile boolean isStopMonitor = false;
+    private String name = "";
 
     public ThreadPoolMonitor(ThreadPoolExecutor executor, String name){
         this.executor = executor;
@@ -23,7 +22,9 @@ public class ThreadPoolMonitor implements Runnable {
     }
 
     public void run(){
-        while(!isStopMonitor){
+
+        while (!isStopMonitor) {
+
             log.debug(name +
                     String.format("[monitor] [%d/%d] Active: %d, Completed: %d, queueSize: %d, Task: %d, isShutdown: %s, isTerminated: %s",
                             this.executor.getPoolSize(),
@@ -34,6 +35,7 @@ public class ThreadPoolMonitor implements Runnable {
                             this.executor.getTaskCount(),
                             this.executor.isShutdown(),
                             this.executor.isTerminated()));
+
             try {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {

@@ -84,6 +84,10 @@ public class ProxyPageTask implements Runnable {
         }
     }
 
+    /**
+     * 将下载的proxy放入代理池
+     * @param page
+     */
     private void handle(Page page){
 
         if (page == null || Preconditions.isBlank(page.getHtml())){
@@ -91,21 +95,29 @@ public class ProxyPageTask implements Runnable {
         }
 
         ProxyListPageParser parser = ProxyListPageParserFactory.getProxyListPageParser(ProxyPool.proxyMap.get(url));
-        List<Proxy> proxyList = parser.parse(page.getHtml());
-        for(Proxy p : proxyList){
+        if (parser!=null) {
 
-            // TODO:
+            List<Proxy> proxyList = parser.parse(page.getHtml());
+            if(Preconditions.isNotBlank(proxyList)) {
+
+                for(Proxy p : proxyList){
+
+                    // TODO:
 //            if(!ZhiHuHttpClient.getInstance().getDetailListPageThreadPool().isTerminated()){
-            ProxyPool.lock.readLock().lock();
-            boolean containFlag = ProxyPool.proxySet.contains(p);
-            ProxyPool.lock.readLock().unlock();
-            if (!containFlag){
-                ProxyPool.lock.writeLock().lock();
-                ProxyPool.proxySet.add(p);
-                ProxyPool.lock.writeLock().unlock();
-            }
+                    ProxyPool.lock.readLock().lock();
+                    boolean containFlag = ProxyPool.proxySet.contains(p);
+                    ProxyPool.lock.readLock().unlock();
+                    if (!containFlag){
+                        ProxyPool.lock.writeLock().lock();
+                        ProxyPool.proxySet.add(p);
+                        ProxyPool.lock.writeLock().unlock();
+                    }
 //            }
+                }
+            }
+
         }
+
     }
 
     /**

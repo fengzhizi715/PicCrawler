@@ -23,7 +23,7 @@ public class ProxyPool {
      * proxySet读写锁
      */
     public final static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
-    public final static Set<Proxy> proxySet = new HashSet<Proxy>();
+    public final static Set<Proxy> proxySet = new HashSet<Proxy>(); // 真正存放Proxy的地方
 
     /**
      * 代理池延迟队列

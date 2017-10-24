@@ -32,6 +32,8 @@ public class ProxyHttpClient {
      */
     private ThreadPoolExecutor proxyDownloadThreadExecutor;
 
+    private boolean stopProxyCrawler = false;
+
     private ProxyHttpClient() {
 
         initThreadPool();
@@ -100,13 +102,16 @@ public class ProxyHttpClient {
     /**
      * 抓取代理
      */
-    public void start(){
+    public void start() {
 
         // 抓取代理
-        new Thread(()->{
+        new Thread(() -> {
 
-            while (true){
-                for (String url : ProxyPool.proxyMap.keySet()){
+            while (true) {
+
+                for (String url : ProxyPool.proxyMap.keySet()) {
+
+                    if (isStopProxyCrawler()) break;
 
                     /**
                      * 首次本机直接下载代理页面
@@ -126,7 +131,6 @@ public class ProxyHttpClient {
                     e.printStackTrace();
                 }
             }
-
         }).start();
 
         // 序列化代理
@@ -164,11 +168,20 @@ public class ProxyHttpClient {
         Page page = new Page();
         page.setStatusCode(response.getStatusLine().getStatusCode());
         page.setHtml(EntityUtils.toString(response.getEntity()));
+
         page.setUrl(request.getURI().toString());
         return page;
     }
 
     public ThreadPoolExecutor getProxyDownloadThreadExecutor() {
         return proxyDownloadThreadExecutor;
+    }
+
+    public boolean isStopProxyCrawler() {
+        return stopProxyCrawler;
+    }
+
+    public void setStopProxyCrawler(boolean stopProxyCrawler) {
+        this.stopProxyCrawler = stopProxyCrawler;
     }
 }

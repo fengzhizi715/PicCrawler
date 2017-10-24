@@ -15,12 +15,9 @@ public class ProxyListPageParserFactory {
     public static ProxyListPageParser getProxyListPageParser(Class clazz){
 
         String parserName = clazz.getSimpleName();
-        ProxyListPageParser proxyListPageParser = null;
         if (map.containsKey(parserName)){
             return map.get(parserName);
-        }
-
-        else {
+        } else {
             try {
                 ProxyListPageParser parser = (ProxyListPageParser) clazz.newInstance();
                 parserName = clazz.getSimpleName();
@@ -32,6 +29,7 @@ public class ProxyListPageParserFactory {
                 e.printStackTrace();
             }
         }
+
         return null;
     }
 }
