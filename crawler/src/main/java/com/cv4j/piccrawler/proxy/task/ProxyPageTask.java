@@ -9,6 +9,7 @@ import com.cv4j.piccrawler.proxy.ProxyPool;
 import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.site.ProxyListPageParserFactory;
 
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.HttpGet;
@@ -23,18 +24,14 @@ import static com.cv4j.piccrawler.proxy.ProxyPool.proxyQueue;
 /**
  * Created by tony on 2017/10/19.
  */
+@Slf4j
 public class ProxyPageTask implements Runnable {
-
-    private Logger logger =  LoggerFactory.getLogger(ProxyPageTask.class);
 
     protected String url;
     private boolean proxyFlag;//是否通过代理下载
     private Proxy currentProxy;//当前线程使用的代理
 
     protected static ProxyHttpClient proxyHttpClient = ProxyHttpClient.get();
-
-    private ProxyPageTask(){
-    }
 
     public ProxyPageTask(String url, boolean proxyFlag){
         this.url = url;
@@ -64,15 +61,15 @@ public class ProxyPageTask implements Runnable {
                     "  executing request " + page.getUrl()  + " response statusCode:" + status +
                     "  request cost time:" + (requestEndTime - requestStartTime) + "ms";
             if(status == HttpStatus.SC_OK){
-                logger.debug(logStr);
+                log.debug(logStr);
                 handle(page);
             } else {
-                logger.error(logStr);
+                log.error(logStr);
                 Thread.sleep(100);
                 retry();
             }
         } catch (InterruptedException e) {
-            logger.error("InterruptedException", e);
+            log.error("InterruptedException", e);
         } catch (IOException e) {
             retry();
         } finally {
