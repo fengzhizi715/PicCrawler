@@ -10,12 +10,11 @@ import com.cv4j.piccrawler.proxy.task.ProxyPageTask;
 import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
 import com.cv4j.piccrawler.utils.SimpleThreadPoolExecutor;
 import com.cv4j.piccrawler.utils.ThreadPoolMonitor;
+import com.safframework.tony.common.utils.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.HashSet;
@@ -73,22 +72,28 @@ public class ProxyHttpClient {
         try {
             proxyArray = (Proxy[]) Utils.deserializeObject(Constant.proxyPath);
             int usableProxyCount = 0;
-            for (Proxy p : proxyArray){
-                if (p == null){
-                    continue;
+
+            if (Preconditions.isNotBlank(proxyArray)) {
+                for (Proxy p : proxyArray){
+                    if (p == null){
+                        continue;
+                    }
+                    p.setTimeInterval(Constant.TIME_INTERVAL);
+                    p.setFailureTimes(0);
+                    p.setSuccessfulTimes(0);
+                    long nowTime = System.currentTimeMillis();
+                    if (nowTime - p.getLastSuccessfulTime() < 1000 * 60 *60){
+                        //上次成功离现在少于一小时
+                        ProxyPool.proxyQueue.add(p);
+                        ProxyPool.proxySet.add(p);
+                        usableProxyCount++;
+                    }
                 }
-                p.setTimeInterval(Constant.TIME_INTERVAL);
-                p.setFailureTimes(0);
-                p.setSuccessfulTimes(0);
-                long nowTime = System.currentTimeMillis();
-                if (nowTime - p.getLastSuccessfulTime() < 1000 * 60 *60){
-                    //上次成功离现在少于一小时
-                    ProxyPool.proxyQueue.add(p);
-                    ProxyPool.proxySet.add(p);
-                    usableProxyCount++;
-                }
+                log.info("反序列化proxy成功，" + proxyArray.length + "个代理,可用代理" + usableProxyCount + "个");
+            } else {
+                log.info("没有可以反序列化的proxy");
             }
-            log.info("反序列化proxy成功，" + proxyArray.length + "个代理,可用代理" + usableProxyCount + "个");
+
         } catch (Exception e) {
             log.warn("反序列化proxy失败");
         }

@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.utils;
 
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,9 +10,8 @@ import java.util.concurrent.ThreadPoolExecutor;
  * 线程池工具类，监视ThreadPoolExecutor执行情况
  * Created by tony on 2017/10/19.
  */
+@Slf4j
 public class ThreadPoolMonitor implements Runnable {
-
-    Logger logger=  LoggerFactory.getLogger(ThreadPoolMonitor.class);
 
     private ThreadPoolExecutor executor;
     public static volatile boolean isStopMonitor = false;
@@ -23,7 +23,7 @@ public class ThreadPoolMonitor implements Runnable {
 
     public void run(){
         while(!isStopMonitor){
-            logger.debug(name +
+            log.debug(name +
                     String.format("[monitor] [%d/%d] Active: %d, Completed: %d, queueSize: %d, Task: %d, isShutdown: %s, isTerminated: %s",
                             this.executor.getPoolSize(),
                             this.executor.getCorePoolSize(),
@@ -37,7 +37,7 @@ public class ThreadPoolMonitor implements Runnable {
                 Thread.sleep(1000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
-                logger.error("InterruptedException",e);
+                log.error("InterruptedException",e);
             }
         }
     }

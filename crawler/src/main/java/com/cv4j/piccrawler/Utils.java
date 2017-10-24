@@ -1,10 +1,7 @@
 package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.proxy.domain.Proxy;
-import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.util.UUID;
