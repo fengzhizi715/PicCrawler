@@ -10,6 +10,7 @@ import com.cv4j.piccrawler.proxy.task.ProxyPageTask;
 import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
 import com.cv4j.piccrawler.utils.SimpleThreadPoolExecutor;
 import com.cv4j.piccrawler.utils.ThreadPoolMonitor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
@@ -26,9 +27,8 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by tony on 2017/10/19.
  */
+@Slf4j
 public class ProxyHttpClient {
-
-    private Logger logger=  LoggerFactory.getLogger(ProxyHttpClient.class);
 
     public static Set<Page> downloadFailureProxyPageSet = new HashSet<>(ProxyPool.proxyMap.size());
 
@@ -88,9 +88,9 @@ public class ProxyHttpClient {
                     usableProxyCount++;
                 }
             }
-            logger.info("反序列化proxy成功，" + proxyArray.length + "个代理,可用代理" + usableProxyCount + "个");
+            log.info("反序列化proxy成功，" + proxyArray.length + "个代理,可用代理" + usableProxyCount + "个");
         } catch (Exception e) {
-            logger.warn("反序列化proxy失败");
+            log.warn("反序列化proxy失败");
         }
     }
 

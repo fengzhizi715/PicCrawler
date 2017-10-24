@@ -34,8 +34,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Slf4j
 public class CrawlerClient {
 
-//    private Logger logger=  LoggerFactory.getLogger(CrawlerClient.class);
-
     private static AtomicInteger count = new AtomicInteger();
     private final static int BUFFER_SIZE = 0x2000; // 8192
 

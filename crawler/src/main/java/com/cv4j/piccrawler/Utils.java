@@ -2,6 +2,7 @@ package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -11,9 +12,8 @@ import java.util.UUID;
 /**
  * Created by tony on 2017/10/10.
  */
+@Slf4j
 public class Utils {
-
-    static Logger logger=  LoggerFactory.getLogger(Utils.class);
 
     /**
      * 生成随机数<br>
@@ -57,7 +57,7 @@ public class Utils {
             fos = new FileOutputStream(filePath, false);
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(object);
-            logger.info("序列化成功");
+            log.info("序列化成功");
             oos.flush();
             fos.close();
             oos.close();
