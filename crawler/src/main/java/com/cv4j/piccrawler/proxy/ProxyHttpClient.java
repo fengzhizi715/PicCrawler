@@ -1,16 +1,10 @@
 package com.cv4j.piccrawler.proxy;
 
 
-import com.cv4j.piccrawler.Constant;
 import com.cv4j.piccrawler.HttpManager;
 import com.cv4j.piccrawler.Page;
-import com.cv4j.piccrawler.Utils;
-import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.task.ProxyPageTask;
-import com.cv4j.piccrawler.proxy.task.ProxySerializeTask;
 import com.cv4j.piccrawler.proxy.thread.SimpleThreadPoolExecutor;
-import com.cv4j.piccrawler.proxy.thread.ThreadPoolMonitor;
-import com.safframework.tony.common.utils.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
@@ -90,9 +84,6 @@ public class ProxyHttpClient {
                 }
             }
         }).start();
-
-        // 序列化代理
-        new Thread(new ProxySerializeTask()).start();
     }
 
     public Page getWebPage(String url) throws IOException {
@@ -126,7 +117,6 @@ public class ProxyHttpClient {
         Page page = new Page();
         page.setStatusCode(response.getStatusLine().getStatusCode());
         page.setHtml(EntityUtils.toString(response.getEntity()));
-
         page.setUrl(request.getURI().toString());
         return page;
     }
