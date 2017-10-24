@@ -184,6 +184,8 @@ public class HttpManager {
 
     public boolean checkProxy(HttpHost proxy) {
 
+        if (proxy == null) return false;
+
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()
                 // 获取连接超时时间
@@ -191,11 +193,8 @@ public class HttpManager {
                 // 请求超时时间
                 .setConnectTimeout(20000)
                 // 响应超时时间
-                .setSocketTimeout(20000);
-
-        if (proxy!=null) {
-            builder.setProxy(proxy);
-        }
+                .setSocketTimeout(20000)
+                .setProxy(proxy);
 
         RequestConfig requestConfig = builder.build();
 
