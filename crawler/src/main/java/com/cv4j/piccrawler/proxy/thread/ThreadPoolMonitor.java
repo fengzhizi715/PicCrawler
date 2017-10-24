@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler.utils;
+package com.cv4j.piccrawler.proxy.thread;
 
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;

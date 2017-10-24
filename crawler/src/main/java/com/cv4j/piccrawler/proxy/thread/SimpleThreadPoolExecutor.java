@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler.utils;
+package com.cv4j.piccrawler.proxy.thread;
 
 import java.util.concurrent.*;
 
