@@ -9,6 +9,7 @@ import com.cv4j.piccrawler.proxy.ProxyPool;
 import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.site.ProxyListPageParserFactory;
 
+import com.safframework.tony.common.utils.Preconditions;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.HttpStatus;
@@ -30,12 +31,12 @@ public class ProxyPageTask implements Runnable {
     protected String url;
     private boolean proxyFlag;//是否通过代理下载
     private Proxy currentProxy;//当前线程使用的代理
-
-    protected static ProxyHttpClient proxyHttpClient = ProxyHttpClient.get();
+    private ProxyHttpClient proxyHttpClient = null;
 
     public ProxyPageTask(String url, boolean proxyFlag){
         this.url = url;
         this.proxyFlag = proxyFlag;
+        this.proxyHttpClient = ProxyHttpClient.get();
     }
 
     public void run(){
@@ -83,16 +84,9 @@ public class ProxyPageTask implements Runnable {
         }
     }
 
-    /**
-     * retry
-     */
-    public void retry(){
-        proxyHttpClient.getProxyDownloadThreadExecutor().execute(new ProxyPageTask(url, false));
-    }
+    private void handle(Page page){
 
-    public void handle(Page page){
-
-        if (page.getHtml() == null || page.getHtml().equals("")){
+        if (page == null || Preconditions.isBlank(page.getHtml())){
             return;
         }
 
@@ -102,16 +96,23 @@ public class ProxyPageTask implements Runnable {
 
             // TODO:
 //            if(!ZhiHuHttpClient.getInstance().getDetailListPageThreadPool().isTerminated()){
-                ProxyPool.lock.readLock().lock();
-                boolean containFlag = ProxyPool.proxySet.contains(p);
-                ProxyPool.lock.readLock().unlock();
-                if (!containFlag){
-                    ProxyPool.lock.writeLock().lock();
-                    ProxyPool.proxySet.add(p);
-                    ProxyPool.lock.writeLock().unlock();
-                }
+            ProxyPool.lock.readLock().lock();
+            boolean containFlag = ProxyPool.proxySet.contains(p);
+            ProxyPool.lock.readLock().unlock();
+            if (!containFlag){
+                ProxyPool.lock.writeLock().lock();
+                ProxyPool.proxySet.add(p);
+                ProxyPool.lock.writeLock().unlock();
+            }
 //            }
         }
+    }
+
+    /**
+     * retry
+     */
+    private void retry(){
+        proxyHttpClient.getProxyDownloadThreadExecutor().execute(new ProxyPageTask(url, false));
     }
 
     private String getProxyStr(Proxy proxy){

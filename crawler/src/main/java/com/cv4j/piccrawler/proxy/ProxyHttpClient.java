@@ -102,6 +102,7 @@ public class ProxyHttpClient {
      */
     public void start(){
 
+        // 抓取代理
         new Thread(()->{
 
             while (true){
@@ -128,9 +129,9 @@ public class ProxyHttpClient {
 
         }).start();
 
+        // 序列化代理
         new Thread(new ProxySerializeTask()).start();
     }
-
 
     public Page getWebPage(String url) throws IOException {
         return getWebPage(url, "UTF-8");

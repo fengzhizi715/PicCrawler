@@ -24,6 +24,7 @@ public class ProxyPool {
      */
     public final static ReentrantReadWriteLock lock = new ReentrantReadWriteLock();
     public final static Set<Proxy> proxySet = new HashSet<Proxy>();
+
     /**
      * 代理池延迟队列
      */
