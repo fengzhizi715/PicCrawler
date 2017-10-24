@@ -14,8 +14,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 public class ThreadPoolMonitor implements Runnable {
 
     private ThreadPoolExecutor executor;
-    public static volatile boolean isStopMonitor = false;
     private String name = "";
+    public static volatile boolean isStopMonitor = false;
+
     public ThreadPoolMonitor(ThreadPoolExecutor executor, String name){
         this.executor = executor;
         this.name = name;
