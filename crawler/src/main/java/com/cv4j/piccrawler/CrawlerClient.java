@@ -5,6 +5,7 @@ import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
+import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -57,6 +58,8 @@ public class CrawlerClient {
     private static class Holder {
         private static final CrawlerClient CLIENT = new CrawlerClient();
     }
+
+    /******************* CrawlerClient 的配置 Start *******************／
 
     /**
      * @param userAgent 添加User-Agent
@@ -157,6 +160,8 @@ public class CrawlerClient {
         header.put(name,value);
         return this;
     }
+
+    /******************* CrawlerClient 的配置 End *******************／
 
     /**
      * 下载图片
@@ -293,7 +298,8 @@ public class CrawlerClient {
         Flowable.just(url)
                 .map(s->createHttpWithGet(s))
                 .map(response->parseHtmlToImages(response))
-                .subscribe(urls->downloadPics(urls));
+                .subscribe(urls -> downloadPics(urls),
+                        throwable-> System.out.println(throwable.getMessage()));
     }
 
     /**

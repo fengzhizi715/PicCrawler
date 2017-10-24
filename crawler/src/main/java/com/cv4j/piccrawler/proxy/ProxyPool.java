@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.proxy;
 
+import com.cv4j.piccrawler.RandomUtils;
 import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.site.ip181.Ip181ProxyListPageParser;
 import com.cv4j.piccrawler.proxy.site.ip66.Ip66ProxyListPageParser;
@@ -47,5 +48,10 @@ public class ProxyPool {
             }
         }
 //        proxyQueue.add(new Direct(TIME_INTERVAL));
+    }
+
+    public static Proxy getRandomProxy() {
+
+        return RandomUtils.getRandomElement(proxySet);
     }
 }
