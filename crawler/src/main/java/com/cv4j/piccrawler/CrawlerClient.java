@@ -5,7 +5,6 @@ import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
-import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;

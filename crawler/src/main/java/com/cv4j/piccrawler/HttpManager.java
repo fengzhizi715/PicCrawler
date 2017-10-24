@@ -2,6 +2,7 @@ package com.cv4j.piccrawler;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -179,5 +180,30 @@ public class HttpManager {
                 setConnectTimeout(20000).
                 setConnectionRequestTimeout(20000).
                 setCookieSpec(CookieSpecs.STANDARD);
+    }
+
+    public boolean checkProxy(HttpHost proxy) {
+
+        CloseableHttpClient client = createHttpClient(20000,proxy,null);
+
+        HttpClientContext httpClientContext = HttpClientContext.create();
+        CloseableHttpResponse response = null;
+        try {
+            HttpGet request = new HttpGet("http://www.163.com/");
+            response = client.execute(request, httpClientContext);
+
+            int statusCode = response.getStatusLine().getStatusCode();// 连接代码
+
+            if (statusCode == 200) {
+
+                return true;
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+
+            return false;
+        }
+
+        return false;
     }
 }
