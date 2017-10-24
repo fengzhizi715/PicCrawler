@@ -101,9 +101,6 @@ public class ProxyPageTask implements Runnable {
             if(Preconditions.isNotBlank(proxyList)) {
 
                 for(Proxy p : proxyList){
-
-                    // TODO:
-//            if(!ZhiHuHttpClient.getInstance().getDetailListPageThreadPool().isTerminated()){
                     ProxyPool.lock.readLock().lock();
                     boolean containFlag = ProxyPool.proxySet.contains(p);
                     ProxyPool.lock.readLock().unlock();
@@ -112,7 +109,6 @@ public class ProxyPageTask implements Runnable {
                         ProxyPool.proxySet.add(p);
                         ProxyPool.lock.writeLock().unlock();
                     }
-//            }
                 }
             }
 

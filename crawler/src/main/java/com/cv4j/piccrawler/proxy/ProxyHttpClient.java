@@ -37,7 +37,6 @@ public class ProxyHttpClient {
     private ProxyHttpClient() {
 
         initThreadPool();
-        initProxy();
     }
 
     public static ProxyHttpClient get() {
@@ -56,47 +55,6 @@ public class ProxyHttpClient {
         proxyDownloadThreadExecutor = new SimpleThreadPoolExecutor(10, 10,
                 0L, TimeUnit.MILLISECONDS,
                 new LinkedBlockingQueue<Runnable>(), "proxyDownloadThreadExecutor");
-
-        // 监测proxyDownloadThreadExecutor
-        new Thread(new ThreadPoolMonitor(proxyDownloadThreadExecutor, "ProxyDownloadThreadExecutor")).start();
-    }
-
-    /**
-     * 初始化proxy
-     *
-     */
-    private void initProxy(){
-        Proxy[] proxyArray = null;
-        try {
-            proxyArray = (Proxy[]) Utils.deserializeObject(Constant.proxyPath);
-            int usableProxyCount = 0;
-
-            if (Preconditions.isNotBlank(proxyArray)) {
-                for (Proxy p : proxyArray){
-
-                    if (p == null){
-                        continue;
-                    }
-
-                    p.setTimeInterval(Constant.TIME_INTERVAL);
-                    p.setFailureTimes(0);
-                    p.setSuccessfulTimes(0);
-                    long nowTime = System.currentTimeMillis();
-                    if (nowTime - p.getLastSuccessfulTime() < 1000 * 60 *60){
-                        //上次成功离现在少于一小时
-                        ProxyPool.proxyQueue.add(p);
-                        ProxyPool.proxySet.add(p);
-                        usableProxyCount++;
-                    }
-                }
-                log.info("反序列化proxy成功，" + proxyArray.length + "个代理,可用代理" + usableProxyCount + "个");
-            } else {
-                log.info("没有可以反序列化的proxy");
-            }
-
-        } catch (Exception e) {
-            log.warn("反序列化proxy失败");
-        }
     }
 
     /**
