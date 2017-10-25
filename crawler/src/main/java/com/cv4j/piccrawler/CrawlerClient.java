@@ -275,7 +275,7 @@ public class CrawlerClient {
     public void downloadPics(List<String> urls) {
 
         if (Preconditions.isNotBlank(urls)) {
-            urls.forEach(url->{
+            urls.stream().parallel().forEach(url->{
 
                 try {
                     CompletableFuture.runAsync(() -> downloadPic(url)).get();

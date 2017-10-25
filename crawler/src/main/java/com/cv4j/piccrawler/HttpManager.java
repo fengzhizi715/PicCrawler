@@ -222,8 +222,7 @@ public class HttpManager {
                 return true;
             }
         } catch (IOException e) {
-            e.printStackTrace();
-
+//            e.printStackTrace();
             return false;
         }
 
