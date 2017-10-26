@@ -12,6 +12,6 @@ public interface ProxyListPageParser {
     /**
      * 是否只要匿名代理
      */
-    static final boolean anonymousFlag = true;
+    boolean anonymousFlag = true;
     List<Proxy> parse(String content);
 }

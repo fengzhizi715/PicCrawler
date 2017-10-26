@@ -1,36 +1,32 @@
 package com.cv4j.piccrawler.proxy;
 
-
 import com.cv4j.piccrawler.HttpManager;
 import com.cv4j.piccrawler.Page;
-import com.cv4j.piccrawler.proxy.task.ProxyPageTask;
-import com.cv4j.piccrawler.proxy.thread.SimpleThreadPoolExecutor;
+
+import com.cv4j.piccrawler.proxy.domain.Proxy;
+import com.cv4j.piccrawler.proxy.task.ProxyPageCallable;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
+import java.util.List;
+import java.util.function.Function;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
- * Created by tony on 2017/10/19.
+ * Created by tony on 2017/10/25.
  */
 @Slf4j
 public class ProxyHttpClient {
 
-    /**
-     * 代理网站下载线程池
-     */
-    private ThreadPoolExecutor proxyDownloadThreadExecutor;
-
     private boolean stopProxyCrawler = false;
 
     private ProxyHttpClient() {
-
-        initThreadPool();
     }
 
     public static ProxyHttpClient get() {
@@ -42,48 +38,45 @@ public class ProxyHttpClient {
     }
 
     /**
-     * 初始化线程池
-     */
-    private void initThreadPool(){
-
-        proxyDownloadThreadExecutor = new SimpleThreadPoolExecutor(10, 10,
-                0L, TimeUnit.MILLISECONDS,
-                new LinkedBlockingQueue<Runnable>(), "proxyDownloadThreadExecutor");
-    }
-
-    /**
      * 抓取代理
      */
     public void start() {
 
-        // 抓取代理
-        new Thread(() -> {
+        List<Proxy> result = ProxyPool.proxyMap.keySet()
+                .stream()
+                .parallel()
+                .map(new Function<String, List<Proxy>>() {
 
-            while (true) {
+                    @Override
+                    public List<Proxy> apply(String s)  {
 
-                for (String url : ProxyPool.proxyMap.keySet()) {
+                        try {
+                            return new ProxyPageCallable(s).call();
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
 
-                    if (isStopProxyCrawler()) break;
-
-                    /**
-                     * 首次本机直接下载代理页面
-                     */
-                    proxyDownloadThreadExecutor.execute(new ProxyPageTask(url, false));
-
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
+                        return null;
                     }
-                }
+                })
+                .flatMap(new Function<List<Proxy>, Stream<Proxy>>() {
+                    @Override
+                    public Stream<Proxy> apply(List<Proxy> proxies) {
 
-                try {
-                    Thread.sleep(1000 * 60 * 60);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
+                        if (proxies == null) return null;
+
+                        return proxies.stream().parallel().filter(new Predicate<Proxy>() {
+                            @Override
+                            public boolean test(Proxy proxy) {
+
+                                HttpHost httpHost = new HttpHost(proxy.getIp(), proxy.getPort());
+                                boolean checkProxy = HttpManager.get().checkProxy(httpHost);
+                                return checkProxy;
+                            }
+                        });
+                    }
+                })
+                .collect(Collectors.toList());
     }
 
     public Page getWebPage(String url) throws IOException {
@@ -93,21 +86,24 @@ public class ProxyHttpClient {
     public Page getWebPage(String url, String charset) throws IOException {
         Page page = new Page();
         CloseableHttpResponse response = HttpManager.get().getResponse(url);
-        page.setStatusCode(response.getStatusLine().getStatusCode());
-        page.setUrl(url);
-        try {
-            if(page.getStatusCode() == 200){
-                page.setHtml(EntityUtils.toString(response.getEntity(), charset));
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } finally {
+        if (response!=null) {
+            page.setStatusCode(response.getStatusLine().getStatusCode());
+            page.setUrl(url);
             try {
-                response.close();
+                if(page.getStatusCode() == 200){
+                    page.setHtml(EntityUtils.toString(response.getEntity(), charset));
+                }
             } catch (IOException e) {
                 e.printStackTrace();
+            } finally {
+                try {
+                    response.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+
         return page;
     }
 
@@ -119,10 +115,6 @@ public class ProxyHttpClient {
         page.setHtml(EntityUtils.toString(response.getEntity()));
         page.setUrl(request.getURI().toString());
         return page;
-    }
-
-    public ThreadPoolExecutor getProxyDownloadThreadExecutor() {
-        return proxyDownloadThreadExecutor;
     }
 
     public boolean isStopProxyCrawler() {
