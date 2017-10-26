@@ -5,8 +5,6 @@ package com.cv4j.piccrawler;
  */
 public class Constant {
 
-    public final static String proxyPath = "src/main/resources/proxies"; // 序列化proxy存放的地址
-
     /**
      * 单个ip请求间隔，单位ms
      */

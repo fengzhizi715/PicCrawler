@@ -8,7 +8,6 @@ import com.cv4j.piccrawler.proxy.task.ProxyPageCallable;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
@@ -101,16 +100,6 @@ public class ProxyHttpClient {
             }
         }
 
-        return page;
-    }
-
-    public Page getWebPage(HttpRequestBase request) throws IOException {
-        CloseableHttpResponse response = null;
-        response = HttpManager.get().getResponse(request);
-        Page page = new Page();
-        page.setStatusCode(response.getStatusLine().getStatusCode());
-        page.setHtml(EntityUtils.toString(response.getEntity()));
-        page.setUrl(request.getURI().toString());
         return page;
     }
 }
