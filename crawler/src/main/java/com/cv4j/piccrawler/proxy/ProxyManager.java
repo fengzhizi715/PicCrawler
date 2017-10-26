@@ -23,21 +23,21 @@ import java.util.stream.Collectors;
  * Created by tony on 2017/10/25.
  */
 @Slf4j
-public class ProxyHttpClient {
+public class ProxyManager {
 
-    private ProxyHttpClient() {
+    private ProxyManager() {
     }
 
-    public static ProxyHttpClient get() {
-        return ProxyHttpClient.Holder.PROXY_HTTP_CLIENT;
+    public static ProxyManager get() {
+        return ProxyManager.Holder.PROXY_HTTP_CLIENT;
     }
 
     private static class Holder {
-        private static final ProxyHttpClient PROXY_HTTP_CLIENT = new ProxyHttpClient();
+        private static final ProxyManager PROXY_HTTP_CLIENT = new ProxyManager();
     }
 
     /**
-     * 抓取代理
+     * 抓取代理，成功的代理存放到ProxyPool中
      */
     public void start() {
 
@@ -82,7 +82,8 @@ public class ProxyHttpClient {
                 .subscribe(new Consumer<Proxy>() {
                     @Override
                     public void accept(Proxy proxy) throws Exception {
-                        log.info(proxy.toString());
+
+                        ProxyPool.proxyList.add(proxy);
                     }
                 });
     }

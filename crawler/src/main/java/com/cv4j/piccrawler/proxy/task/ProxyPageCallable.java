@@ -1,7 +1,7 @@
 package com.cv4j.piccrawler.proxy.task;
 
 import com.cv4j.piccrawler.Page;
-import com.cv4j.piccrawler.proxy.ProxyHttpClient;
+import com.cv4j.piccrawler.proxy.ProxyManager;
 import com.cv4j.piccrawler.proxy.ProxyListPageParser;
 import com.cv4j.piccrawler.proxy.ProxyPool;
 import com.cv4j.piccrawler.proxy.domain.Proxy;
@@ -23,11 +23,11 @@ import java.util.concurrent.Callable;
 public class ProxyPageCallable implements Callable<List<Proxy>>{
 
     protected String url;
-    private ProxyHttpClient proxyHttpClient = null;
+    private ProxyManager proxyHttpClient = null;
 
     public ProxyPageCallable(String url){
         this.url = url;
-        this.proxyHttpClient = ProxyHttpClient.get();
+        this.proxyHttpClient = ProxyManager.get();
     }
 
     @Override
@@ -78,8 +78,7 @@ public class ProxyPageCallable implements Callable<List<Proxy>>{
 
                 for(Proxy p : proxyList){
 
-                    boolean containFlag = ProxyPool.list.contains(p);
-                    if (!containFlag) {
+                    if (!ProxyPool.proxyList.contains(p)) {
                         result.add(p);
                     }
                 }

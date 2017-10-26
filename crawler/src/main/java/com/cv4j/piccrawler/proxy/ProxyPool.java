@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.proxy;
 
+import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.site.ip181.Ip181ProxyListPageParser;
 import com.cv4j.piccrawler.proxy.site.ip66.Ip66ProxyListPageParser;
 import com.cv4j.piccrawler.proxy.site.mimiip.MimiipProxyListPageParser;
@@ -15,7 +16,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  */
 public class ProxyPool {
 
-    public static CopyOnWriteArrayList list = new CopyOnWriteArrayList();
+    public static CopyOnWriteArrayList<Proxy> proxyList = new CopyOnWriteArrayList<>();
     public final static Map<String, Class> proxyMap = new HashMap<>();
 
     static {
