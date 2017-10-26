@@ -2,7 +2,6 @@ package com.cv4j.piccrawler;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
@@ -127,7 +126,8 @@ public class HttpManager {
                 // 请求超时时间
                 .setConnectTimeout(timeOut)
                 // 响应超时时间
-                .setSocketTimeout(timeOut);
+                .setSocketTimeout(timeOut)
+                .setCookieSpec(CookieSpecs.STANDARD);
 
         if (proxy!=null) {
             builder.setProxy(proxy);
@@ -173,13 +173,6 @@ public class HttpManager {
         }
 
         return response;
-    }
-
-    public org.apache.http.client.config.RequestConfig.Builder getRequestConfigBuilder(){
-        return RequestConfig.custom().setSocketTimeout(20000).
-                setConnectTimeout(20000).
-                setConnectionRequestTimeout(20000).
-                setCookieSpec(CookieSpecs.STANDARD);
     }
 
     public boolean checkProxy(HttpHost proxy) {
