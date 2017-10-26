@@ -5,17 +5,19 @@ import com.cv4j.piccrawler.Page;
 
 import com.cv4j.piccrawler.proxy.domain.Proxy;
 import com.cv4j.piccrawler.proxy.task.ProxyPageCallable;
+import io.reactivex.Flowable;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.reactivestreams.Publisher;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * Created by tony on 2017/10/25.
@@ -39,13 +41,12 @@ public class ProxyHttpClient {
      */
     public void start() {
 
-        List<Proxy> result = ProxyPool.proxyMap.keySet()
-                .stream()
+        Flowable.fromIterable(ProxyPool.proxyMap.keySet())
                 .parallel()
                 .map(new Function<String, List<Proxy>>() {
 
                     @Override
-                    public List<Proxy> apply(String s)  {
+                    public List<Proxy> apply(String s) throws Exception {
 
                         try {
                             return new ProxyPageCallable(s).call();
@@ -56,23 +57,34 @@ public class ProxyHttpClient {
                         return null;
                     }
                 })
-                .flatMap(new Function<List<Proxy>, Stream<Proxy>>() {
+                .flatMap(new Function<List<Proxy>, Publisher<Proxy>>() {
                     @Override
-                    public Stream<Proxy> apply(List<Proxy> proxies) {
+                    public Publisher<Proxy> apply(List<Proxy> proxies) throws Exception {
 
                         if (proxies == null) return null;
 
-                        return proxies.stream().parallel().filter(new Predicate<Proxy>() {
+                        List<Proxy> result = proxies
+                                .stream()
+                                .parallel()
+                                .filter(new Predicate<Proxy>() {
                             @Override
                             public boolean test(Proxy proxy) {
 
                                 HttpHost httpHost = new HttpHost(proxy.getIp(), proxy.getPort());
                                 return HttpManager.get().checkProxy(httpHost);
                             }
-                        });
+                        }).collect(Collectors.toList());
+
+                        return Flowable.fromIterable(result);
                     }
                 })
-                .collect(Collectors.toList());
+                .sequential()
+                .subscribe(new Consumer<Proxy>() {
+                    @Override
+                    public void accept(Proxy proxy) throws Exception {
+                        log.info(proxy.toString());
+                    }
+                });
     }
 
     public Page getWebPage(String url) throws IOException {

@@ -401,7 +401,7 @@ public class CrawlerClient {
         String path = fileStrategy.filePath();
 
         String format = Utils.tryToGetPicFormat(url);
-
+        // 优先使用url地址中图片的格式，如果不存在格式取fileStrategy的图片格式
         if (Preconditions.isBlank(format)) {
             format = fileStrategy.picFormat();
         }

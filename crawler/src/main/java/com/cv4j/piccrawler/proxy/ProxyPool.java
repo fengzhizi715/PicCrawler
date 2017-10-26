@@ -9,7 +9,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 
-
 /**
  * 代理池
  * Created by tony on 2017/10/19.
@@ -20,7 +19,7 @@ public class ProxyPool {
     public final static Map<String, Class> proxyMap = new HashMap<>();
 
     static {
-        int pages = 1;
+        int pages = 8;
         for(int i = 1; i <= pages; i++){
             proxyMap.put("http://www.xicidaili.com/wt/" + i + ".html", XicidailiProxyListPageParser.class);
             proxyMap.put("http://www.xicidaili.com/nn/" + i + ".html", XicidailiProxyListPageParser.class);
