@@ -193,7 +193,7 @@ public class CrawlerClient {
     private void doDownloadPic(String url) {
 
         try {
-            writeImageToFile(createHttpWithPost(url));
+            writeImageToFile(createHttpWithPost(url),url);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -221,7 +221,7 @@ public class CrawlerClient {
      * @param url 图片地址
      * @return
      */
-    public Flowable<File> downloadPicToFlowable(String url) {
+    public Flowable<File> downloadPicToFlowable(final String url) {
 
         if (repeat==1) {
 
@@ -240,7 +240,7 @@ public class CrawlerClient {
 
             }, BackpressureStrategy.BUFFER)
                     .map(s->createHttpWithPost(s))
-                    .map(response->writeImageToFile(response));
+                    .map(response->writeImageToFile(response,url));
 
         } else if (repeat>1) {
             return Flowable.create((FlowableEmitter<String> e) -> {
@@ -262,7 +262,7 @@ public class CrawlerClient {
             }, BackpressureStrategy.BUFFER)
                     .map(s->createHttpWithPost(s))
                     .observeOn(Schedulers.io())
-                    .map(response->writeImageToFile(response));
+                    .map(response->writeImageToFile(response,url));
         }
 
         return null;
@@ -359,10 +359,11 @@ public class CrawlerClient {
     /**
      * 将response的响应流写入文件中
      * @param response
+     * @param url
      * @return
      * @throws IOException
      */
-    private File writeImageToFile(CloseableHttpResponse response) throws IOException{
+    private File writeImageToFile(CloseableHttpResponse response,String url) throws IOException{
 
         if (response==null) return null;
 
@@ -398,7 +399,13 @@ public class CrawlerClient {
         }
 
         String path = fileStrategy.filePath();
-        String format = fileStrategy.picFormat();
+
+        String format = Utils.tryToGetPicFormat(url);
+
+        if (Preconditions.isBlank(format)) {
+            format = fileStrategy.picFormat();
+        }
+
         FileGenType fileGenType = fileStrategy.genType();
 
         File directory = null;

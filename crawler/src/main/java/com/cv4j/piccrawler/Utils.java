@@ -8,6 +8,8 @@ import java.util.UUID;
  */
 public class Utils {
 
+    public static final String reg="(?i).+?\\.(jpg|jpeg|gif|bmp|png|webp|svg)";
+
     /**
      * 生成随机数<br>
      * GUID： 即Globally Unique Identifier（全球唯一标识符） 也称作 UUID(Universally Unique
@@ -37,5 +39,37 @@ public class Utils {
         }
 
         return directory;
+    }
+
+    public static String tryToGetPicFormat(String url) {
+
+        if (url == null) return null;
+
+        if (!url.matches(reg)) return null;
+
+        if (url.indexOf(".jpg")>-1) {
+
+            return "jpg";
+        } else if (url.indexOf(".jpeg")>-1) {
+
+            return "jpeg";
+        } else if (url.indexOf(".gif")>-1) {
+
+            return "gif";
+        } else if (url.indexOf(".bmp")>-1) {
+
+            return "bmp";
+        } else if (url.indexOf(".png")>-1) {
+
+            return "png";
+        } else if (url.indexOf(".webp")>-1) {
+
+            return "webp";
+        } else if (url.indexOf(".svg")>-1) {
+
+            return "svg";
+        }
+
+        return null;
     }
 }
