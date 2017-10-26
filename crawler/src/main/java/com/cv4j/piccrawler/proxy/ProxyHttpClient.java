@@ -24,8 +24,6 @@ import java.util.stream.Stream;
 @Slf4j
 public class ProxyHttpClient {
 
-    private boolean stopProxyCrawler = false;
-
     private ProxyHttpClient() {
     }
 
@@ -70,8 +68,7 @@ public class ProxyHttpClient {
                             public boolean test(Proxy proxy) {
 
                                 HttpHost httpHost = new HttpHost(proxy.getIp(), proxy.getPort());
-                                boolean checkProxy = HttpManager.get().checkProxy(httpHost);
-                                return checkProxy;
+                                return HttpManager.get().checkProxy(httpHost);
                             }
                         });
                     }
@@ -115,13 +112,5 @@ public class ProxyHttpClient {
         page.setHtml(EntityUtils.toString(response.getEntity()));
         page.setUrl(request.getURI().toString());
         return page;
-    }
-
-    public boolean isStopProxyCrawler() {
-        return stopProxyCrawler;
-    }
-
-    public void setStopProxyCrawler(boolean stopProxyCrawler) {
-        this.stopProxyCrawler = stopProxyCrawler;
     }
 }
