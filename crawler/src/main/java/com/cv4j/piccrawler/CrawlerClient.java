@@ -5,6 +5,8 @@ import com.cv4j.piccrawler.http.HttpParam;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
+import io.reactivex.functions.Consumer;
+import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -30,7 +32,6 @@ public class CrawlerClient {
 
     private int repeat = 1;
     private int sleepTime = 0;
-    private FileStrategy fileStrategy;
     private HttpManager httpManager;
     private DownloadManager downloadManager;
     private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder();
@@ -87,7 +88,6 @@ public class CrawlerClient {
      */
     public CrawlerClient fileStrategy(FileStrategy fileStrategy) {
 
-        this.fileStrategy = fileStrategy;
         downloadManager.setFileStrategy(fileStrategy);
         return this;
     }
@@ -297,6 +297,24 @@ public class CrawlerClient {
                 .map(response->parseHtmlToImages(response))
                 .subscribe(urls -> downloadPics(urls),
                         throwable-> System.out.println(throwable.getMessage()));
+    }
+
+    /**
+     * 下载多个网页的全部图片
+     * @param urls
+     */
+    public void downloadWebPageImages(List<String> urls) {
+
+        if (Preconditions.isNotBlank(urls)) {
+
+            Flowable.fromIterable(urls)
+                    .parallel()
+                    .map(url->httpManager.createHttpWithGet(url))
+                    .map(response->parseHtmlToImages(response))
+                    .sequential()
+                    .subscribe(list -> downloadPics(list),
+                            throwable-> System.out.println(throwable.getMessage()));
+        }
     }
 
     private List<String> parseHtmlToImages(CloseableHttpResponse response) {
