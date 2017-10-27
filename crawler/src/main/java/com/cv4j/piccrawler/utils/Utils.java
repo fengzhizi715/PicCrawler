@@ -175,12 +175,4 @@ public class Utils {
 
         return url;
     }
-
-    public static void main(String[] args) {
-
-        String url = "upload.jianshu.io/users/upload_avatars/2613397/005ecef74663?imageMogr2/auto-orient/strip|imageView2/1/w/64/h/64";
-        System.out.println(tryToEscapeUrl(url));
-
-    }
-
 }

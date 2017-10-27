@@ -61,6 +61,7 @@ Maven:
                     }
                 })
                 .repeat(200) // 重复200次
+                .build()
                 .downloadPic(url);
 ```
 
@@ -89,6 +90,7 @@ Maven:
                     }
                 })
                 .repeat(200)
+                .build()
                 .downloadPicUseRx(url);
 ```
 
@@ -118,6 +120,7 @@ Maven:
                     }
                 })
                 .repeat(20)
+                .build()
                 .downloadPicToFlowable(url)
                 .subscribe(new Consumer<File>() {
                     @Override
@@ -176,5 +179,33 @@ Maven:
                         return FileGenType.AUTO_INCREMENT;
                     }
                 })
+                .build()
+                .downloadWebPageImages(url);
+```
+
+## 1.4 下载多个网页的全部图片
+```java
+        List<String> urls = ...; // 多个网页的集合
+        CrawlerClient.get()
+                .timeOut(6000)
+                .fileStrategy(new FileStrategy() {
+
+                    @Override
+                    public String filePath() {
+                        return "temp";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.AUTO_INCREMENT;
+                    }
+                })
+                .build()
                 .downloadWebPageImages(url);
 ```
