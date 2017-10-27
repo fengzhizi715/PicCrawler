@@ -208,5 +208,5 @@ Maven:
                     }
                 })
                 .build()
-                .downloadWebPageImages(url);
+                .downloadWebPageImages(urls);
 ```
