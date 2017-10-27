@@ -1,14 +1,10 @@
-package com.cv4j.piccrawler;
+package com.cv4j.piccrawler.http;
 
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpRequestBase;
-import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -25,13 +21,11 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
-import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
-import java.util.Random;
 
 /**
  * Created by tony on 2017/10/19.
@@ -102,15 +96,6 @@ public class HttpManager {
     }
 
     /**
-     * 创建新的HttpClient
-     * @return
-     */
-    public CloseableHttpClient createHttpClient() {
-
-        return createHttpClient(20000,null,null);
-    }
-
-    /**
      * 获取Http客户端连接对象
      * @param timeOut 超时时间
      * @param proxy   代理
@@ -153,72 +138,5 @@ public class HttpManager {
         }
 
         return httpClientBuilder.build();
-    }
-
-    public CloseableHttpResponse getResponse(String url) {
-
-        HttpGet request = new HttpGet(url);
-        return getResponse(request);
-    }
-
-    public CloseableHttpResponse getResponse(HttpRequestBase request) {
-
-        request.setHeader("User-Agent", Constant.userAgentArray[new Random().nextInt(Constant.userAgentArray.length)]);
-        HttpClientContext httpClientContext = HttpClientContext.create();
-        CloseableHttpResponse response = null;
-        try {
-            response = createHttpClient().execute(request, httpClientContext);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return response;
-    }
-
-    public boolean checkProxy(HttpHost proxy) {
-
-        if (proxy == null) return false;
-
-        // 创建Http请求配置参数
-        RequestConfig.Builder builder = RequestConfig.custom()
-                // 获取连接超时时间
-                .setConnectionRequestTimeout(20000)
-                // 请求超时时间
-                .setConnectTimeout(20000)
-                // 响应超时时间
-                .setSocketTimeout(20000)
-                .setProxy(proxy);
-
-        RequestConfig requestConfig = builder.build();
-
-        // 创建httpClient
-        HttpClientBuilder httpClientBuilder = HttpClients.custom();
-
-        httpClientBuilder
-                // 把请求相关的超时信息设置到连接客户端
-                .setDefaultRequestConfig(requestConfig)
-                // 配置连接池管理对象
-                .setConnectionManager(connManager);
-
-        CloseableHttpClient client =  httpClientBuilder.build();
-
-        HttpClientContext httpClientContext = HttpClientContext.create();
-        CloseableHttpResponse response = null;
-        try {
-            HttpGet request = new HttpGet("http://www.163.com/");
-            response = client.execute(request, httpClientContext);
-
-            int statusCode = response.getStatusLine().getStatusCode();// 连接代码
-
-            if (statusCode == 200) {
-
-                return true;
-            }
-        } catch (IOException e) {
-//            e.printStackTrace();
-            return false;
-        }
-
-        return false;
     }
 }

@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler;
 
+import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.safframework.tony.common.utils.IOUtils;
@@ -510,7 +511,7 @@ public class CrawlerClient {
             for (Element src : media) {
                 if (src.tagName().equals("img")) {
 
-                    if (Preconditions.isNotBlank(src.attr("abs:src"))) {
+                    if (Preconditions.isNotBlank(src.attr("abs:src"))) { // 图片的绝对路径不为空
 
                         log.info(src.attr("abs:src"));
                         urls.add(src.attr("abs:src"));
