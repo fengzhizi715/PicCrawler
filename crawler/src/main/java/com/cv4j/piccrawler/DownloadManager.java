@@ -2,6 +2,7 @@ package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
+import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import org.apache.http.HttpEntity;

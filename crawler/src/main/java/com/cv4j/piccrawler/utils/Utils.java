@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler;
+package com.cv4j.piccrawler.utils;
 
 import java.io.*;
 import java.util.UUID;
