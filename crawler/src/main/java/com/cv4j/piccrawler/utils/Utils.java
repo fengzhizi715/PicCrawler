@@ -1,14 +1,38 @@
 package com.cv4j.piccrawler.utils;
 
 import java.io.*;
+import java.util.HashMap;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by tony on 2017/10/10.
  */
 public class Utils {
 
-    public static final String reg="(?i).+?\\.(jpg|jpeg|gif|bmp|png|webp|svg)";
+    public static final String PIC_REGEX = ".*\\.(jpg|jpeg|gif|bmp|png|webp|svg).*";
+
+    public static final String ESCAPE_REGEX = ".*\\.( |\"|#|(|)|\\+|,|:|;|<|>|@|\\||).*";
+
+    public static HashMap<String,String> map = new HashMap<>();
+
+    static {
+        map.put(" ","%20");
+        map.put("\"","%22");
+        map.put("#","%23");
+        map.put("(","%28");
+        map.put(")","%29");
+        map.put("+","%2B");
+        map.put(",","%2C");
+        map.put(":","%3A");
+        map.put(";","%3B");
+        map.put("<","%3C");
+        map.put(">","%3E");
+        map.put("@","%40");
+        map.put("\\","%5C");
+        map.put("|","%7C");
+    }
 
     /**
      * 生成随机数<br>
@@ -45,7 +69,7 @@ public class Utils {
 
         if (url == null) return null;
 
-        if (!url.matches(reg)) return null;
+        if (!url.matches(PIC_REGEX)) return null;
 
         if (url.indexOf(".jpg")>-1) {
 
@@ -72,4 +96,91 @@ public class Utils {
 
         return null;
     }
+
+    public static String tryToEscapeUrl(String url) {
+
+        if (url == null) return null;
+
+        if (!url.matches(ESCAPE_REGEX)) return url;
+
+        if (url.indexOf(" ")>-1) {
+
+            url =  url.replace(" ",map.get(" "));
+        }
+
+        if (url.indexOf("\"")>-1) {
+
+            url =  url.replace("\"",map.get("\""));
+        }
+
+        if (url.indexOf("#")>-1) {
+
+            url =  url.replace("#",map.get("#"));
+        }
+
+        if (url.indexOf("(")>-1) {
+
+            url =  url.replace("(",map.get("("));
+        }
+
+        if (url.indexOf(")")>-1) {
+
+            url =  url.replace(")",map.get(")"));
+        }
+
+        if (url.indexOf("+")>-1) {
+
+            url =  url.replace("+",map.get("+"));
+        }
+
+        if (url.indexOf(",")>-1) {
+
+            url =  url.replace(",",map.get(","));
+        }
+
+        if (url.indexOf(":")>-1) {
+
+            url =  url.replace(":",map.get(":"));
+        }
+
+        if (url.indexOf(";")>-1) {
+
+            url =  url.replace(";",map.get(";"));
+        }
+
+        if (url.indexOf("<")>-1) {
+
+            url =  url.replace("<",map.get("<"));
+        }
+
+        if (url.indexOf(">")>-1) {
+
+            url =  url.replace(">",map.get(">"));
+        }
+
+        if (url.indexOf("@")>-1) {
+
+            url =  url.replace("@",map.get("@"));
+        }
+
+        if (url.indexOf("\\")>-1) {
+
+            url =  url.replace("\\",map.get("\\"));
+        }
+
+        if (url.indexOf("|")>-1) {
+
+            url =  url.replace("|",map.get("|"));
+        }
+
+        return url;
+    }
+
+    public static void main(String[] args) {
+
+        String url = "upload.jianshu.io/users/upload_avatars/2613397/005ecef74663?imageMogr2/auto-orient/strip|imageView2/1/w/64/h/64";
+        System.out.println(tryToEscapeUrl(url));
+
+    }
+
 }

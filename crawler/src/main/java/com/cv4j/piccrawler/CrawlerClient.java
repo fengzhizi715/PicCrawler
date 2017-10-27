@@ -2,11 +2,10 @@ package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.http.HttpParam;
+import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
-import io.reactivex.functions.Consumer;
-import io.reactivex.functions.Function;
 import io.reactivex.schedulers.Schedulers;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
@@ -344,8 +343,16 @@ public class CrawlerClient {
 
                     if (Preconditions.isNotBlank(src.attr("abs:src"))) { // 图片的绝对路径不为空
 
-                        log.info(src.attr("abs:src"));
-                        urls.add(src.attr("abs:src"));
+                        String picUrl = src.attr("abs:src");
+                        picUrl = Utils.tryToEscapeUrl(picUrl);
+                        log.info(picUrl);
+                        urls.add(picUrl);
+                    } else if (Preconditions.isNotBlank(src.attr("src"))){ // 图片的相对路径不为空
+
+                        String picUrl = src.attr("src").replace("//","");
+                        picUrl = "http://"+Utils.tryToEscapeUrl(picUrl);
+                        log.info(picUrl);
+                        urls.add(picUrl);
                     }
                 }
             }
