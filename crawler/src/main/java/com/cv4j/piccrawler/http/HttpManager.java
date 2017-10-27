@@ -1,10 +1,14 @@
 package com.cv4j.piccrawler.http;
 
+import com.safframework.tony.common.utils.Preconditions;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
 import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.Registry;
 import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
@@ -21,11 +25,13 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+import java.io.IOException;
 import java.security.KeyManagementException;
 import java.security.NoSuchAlgorithmException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 import java.util.Arrays;
+import java.util.Map;
 
 /**
  * Created by tony on 2017/10/19.
@@ -36,11 +42,14 @@ public class HttpManager {
      * 全局连接池对象
      */
     private static PoolingHttpClientConnectionManager connManager = null;
+    private CloseableHttpClient httpClient;
+    private HttpParam httpParam;
 
     /**
      * 配置连接池信息，支持http/https
      */
     static {
+
         SSLContext sslcontext = null;
         try {
             //获取TLS安全协议上下文
@@ -91,8 +100,22 @@ public class HttpManager {
         return HttpManager.Holder.MANAGER;
     }
 
-    private static class Holder {
-        private static final HttpManager MANAGER = new HttpManager();
+
+    public HttpParam getHttpParam() {
+        return httpParam;
+    }
+
+    public void setHttpParam(HttpParam httpParam) {
+        this.httpParam = httpParam;
+    }
+
+    /**
+     * 获取Http客户端连接对象
+     * @return Http客户端连接对象
+     */
+    private CloseableHttpClient createHttpClient() {
+
+        return createHttpClient(20000,null,null);
     }
 
     /**
@@ -102,7 +125,7 @@ public class HttpManager {
      * @param cookie  Cookie
      * @return Http客户端连接对象
      */
-    public CloseableHttpClient createHttpClient(int timeOut,HttpHost proxy,BasicClientCookie cookie) {
+    private CloseableHttpClient createHttpClient(int timeOut,HttpHost proxy,BasicClientCookie cookie) {
 
         // 创建Http请求配置参数
         RequestConfig.Builder builder = RequestConfig.custom()
@@ -138,5 +161,92 @@ public class HttpManager {
         }
 
         return httpClientBuilder.build();
+    }
+
+
+    /**
+     * 创建网络请求
+     * @param url
+     * @return
+     */
+    public CloseableHttpResponse createHttpWithPost(String url) {
+
+        // 获取客户端连接对象
+        CloseableHttpClient httpClient = getHttpClient();
+        // 创建Post请求对象
+        HttpPost httpPost = new HttpPost(url);
+
+        if (Preconditions.isNotBlank(httpParam)) {
+
+            Map<String,String> header = httpParam.getHeader();
+
+            if (Preconditions.isNotBlank(header)) {
+                for (String key : header.keySet()) {
+                    httpPost.setHeader(key,header.get(key));
+                }
+            }
+        }
+
+        CloseableHttpResponse response = null;
+
+        // 执行请求
+        try {
+            response = httpClient.execute(httpPost);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    public CloseableHttpResponse createHttpWithGet(String url) {
+
+        // 获取客户端连接对象
+        CloseableHttpClient httpClient = getHttpClient();
+        // 创建Get请求对象
+        HttpGet httpGet = new HttpGet(url);
+
+        if (Preconditions.isNotBlank(httpParam)) {
+
+            Map<String,String> header = httpParam.getHeader();
+
+            if (Preconditions.isNotBlank(header)) {
+                for (String key : header.keySet()) {
+                    httpGet.setHeader(key,header.get(key));
+                }
+            }
+        }
+
+        CloseableHttpResponse response = null;
+
+        // 执行请求
+        try {
+            response = httpClient.execute(httpGet);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return response;
+    }
+
+    private CloseableHttpClient getHttpClient() {
+
+        if (httpClient!=null) return httpClient;
+
+        if (Preconditions.isNotBlank(httpParam)) {
+
+            int timeOut = httpParam.getTimeOut();
+            HttpHost proxy = httpParam.getProxy();
+            BasicClientCookie cookie = httpParam.getCookie();
+            httpClient = createHttpClient(timeOut,proxy,cookie);
+        } else {
+            httpClient = createHttpClient();
+        }
+
+        return httpClient;
+    }
+
+    private static class Holder {
+        private static final HttpManager MANAGER = new HttpManager();
     }
 }

@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler;
 
 import com.cv4j.piccrawler.http.HttpManager;
+import com.cv4j.piccrawler.http.HttpParam;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
@@ -9,9 +10,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpHost;
 import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
@@ -30,16 +28,12 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class CrawlerClient {
 
-    private int timeOut;
     private int repeat = 1;
     private int sleepTime = 0;
     private FileStrategy fileStrategy;
-    private HttpHost proxy;
-    private BasicClientCookie cookie;
-    private Map<String,String> header = new HashMap<>();
     private HttpManager httpManager;
-    private CloseableHttpClient httpClient;
     private DownloadManager downloadManager;
+    private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder();
 
     private CrawlerClient() {
 
@@ -83,7 +77,7 @@ public class CrawlerClient {
      */
     public CrawlerClient timeOut(int timeOut) {
 
-        this.timeOut = timeOut;
+        httpParamBuilder.timeOut(timeOut);
         return this;
     }
 
@@ -131,7 +125,7 @@ public class CrawlerClient {
      */
     public CrawlerClient proxy(HttpHost proxy) {
 
-        this.proxy = proxy;
+        httpParamBuilder.proxy(proxy);
         return this;
     }
 
@@ -142,7 +136,7 @@ public class CrawlerClient {
      */
     public CrawlerClient cookie(BasicClientCookie cookie) {
 
-        this.cookie = cookie;
+        httpParamBuilder.cookie(cookie);
         return this;
     }
 
@@ -154,7 +148,13 @@ public class CrawlerClient {
      */
     public CrawlerClient addHeader(String name,String value) {
 
-        header.put(name,value);
+        httpParamBuilder.addHeader(name,value);
+        return this;
+    }
+
+    public CrawlerClient build() {
+
+        httpManager.setHttpParam(httpParamBuilder.build());
         return this;
     }
 
@@ -191,7 +191,7 @@ public class CrawlerClient {
     private void doDownloadPic(String url) {
 
         try {
-            downloadManager.writeImageToFile(createHttpWithPost(url),url);
+            downloadManager.writeImageToFile(httpManager.createHttpWithPost(url),url);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -237,7 +237,7 @@ public class CrawlerClient {
                 e.onNext(url);
 
             }, BackpressureStrategy.BUFFER)
-                    .map(s->createHttpWithPost(s))
+                    .map(s->httpManager.createHttpWithPost(s))
                     .map(response->downloadManager.writeImageToFile(response,url));
 
         } else if (repeat>1) {
@@ -258,7 +258,7 @@ public class CrawlerClient {
                 }
 
             }, BackpressureStrategy.BUFFER)
-                    .map(s->createHttpWithPost(s))
+                    .map(s->httpManager.createHttpWithPost(s))
                     .observeOn(Schedulers.io())
                     .map(response->downloadManager.writeImageToFile(response,url));
         }
@@ -293,65 +293,10 @@ public class CrawlerClient {
     public void downloadWebPageImages(String url) {
 
         Flowable.just(url)
-                .map(s->createHttpWithGet(s))
+                .map(s->httpManager.createHttpWithGet(s))
                 .map(response->parseHtmlToImages(response))
                 .subscribe(urls -> downloadPics(urls),
                         throwable-> System.out.println(throwable.getMessage()));
-    }
-
-    /**
-     * 创建网络请求
-     * @param url
-     * @return
-     */
-    private CloseableHttpResponse createHttpWithPost(String url) {
-
-        // 获取客户端连接对象
-        CloseableHttpClient httpClient = getHttpClient();
-        // 创建Post请求对象
-        HttpPost httpPost = new HttpPost(url);
-
-        if (Preconditions.isNotBlank(header)) {
-            for (String key : header.keySet()) {
-                httpPost.setHeader(key,header.get(key));
-            }
-        }
-
-        CloseableHttpResponse response = null;
-
-        // 执行请求
-        try {
-            response = httpClient.execute(httpPost);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return response;
-    }
-
-    private CloseableHttpResponse createHttpWithGet(String url) {
-
-        // 获取客户端连接对象
-        CloseableHttpClient httpClient = getHttpClient();
-        // 创建Get请求对象
-        HttpGet httpGet = new HttpGet(url);
-
-        if (Preconditions.isNotBlank(header)) {
-            for (String key : header.keySet()) {
-                httpGet.setHeader(key,header.get(key));
-            }
-        }
-
-        CloseableHttpResponse response = null;
-
-        // 执行请求
-        try {
-            response = httpClient.execute(httpGet);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return response;
     }
 
     private List<String> parseHtmlToImages(CloseableHttpResponse response) {
@@ -399,14 +344,5 @@ public class CrawlerClient {
         }
 
         return urls;
-    }
-
-    private CloseableHttpClient getHttpClient() {
-
-        if (httpClient!=null) return httpClient;
-
-        httpClient = httpManager.createHttpClient(timeOut,proxy,cookie);
-
-        return httpClient;
     }
  }
