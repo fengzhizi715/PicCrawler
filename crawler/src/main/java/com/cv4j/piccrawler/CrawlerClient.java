@@ -344,7 +344,6 @@ public class CrawlerClient {
                     if (Preconditions.isNotBlank(src.attr("abs:src"))) { // 图片的绝对路径不为空
 
                         String picUrl = src.attr("abs:src");
-                        picUrl = Utils.tryToEscapeUrl(picUrl);
                         log.info(picUrl);
                         urls.add(picUrl);
                     } else if (Preconditions.isNotBlank(src.attr("src"))){ // 图片的相对路径不为空
