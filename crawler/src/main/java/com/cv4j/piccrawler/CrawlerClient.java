@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler;
 
+import com.cv4j.piccrawler.download.DownloadManager;
 import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.http.HttpParam;
 import com.cv4j.piccrawler.utils.Utils;
