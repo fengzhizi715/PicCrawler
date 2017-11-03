@@ -191,7 +191,13 @@ public class CrawlerClient {
     private void doDownloadPic(String url) {
 
         try {
-            downloadManager.writeImageToFile(httpManager.createHttpWithPost(url),url);
+
+            if (Preconditions.isNotBlank(httpParamBuilder.getHeader("Referer"))) { // 针对需要Referer的图片，我们使用Get请求
+
+                downloadManager.writeImageToFile(httpManager.createHttpWithGet(url),url);
+            } else {
+                downloadManager.writeImageToFile(httpManager.createHttpWithPost(url),url);
+            }
         } catch (IOException e) {
             e.printStackTrace();
         }

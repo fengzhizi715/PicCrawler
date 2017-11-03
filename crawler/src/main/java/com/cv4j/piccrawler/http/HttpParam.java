@@ -66,6 +66,10 @@ public class HttpParam {
             return this;
         }
 
+        public String getHeader(String name) {
+            return header.get(name);
+        }
+
         public HttpParam build() {
             return new HttpParam(this);
         }
