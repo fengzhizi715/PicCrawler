@@ -19,7 +19,7 @@ repositories {
 Gradle:
 
 ```groovy
-compile 'com.cv4j.piccrawler:crawler:0.2.1'
+compile 'com.cv4j.piccrawler:crawler:0.2.2'
 ```
 
 
@@ -29,7 +29,7 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.2.1</version>
+  <version>0.2.2</version>
   <type>pom</type>
 </dependency>
 ```
@@ -210,3 +210,5 @@ Maven:
                 .build()
                 .downloadWebPageImages(urls);
 ```
+
+> 注意，如果图片有防盗链接，可以使用referer()方法，传入网站的网址。
