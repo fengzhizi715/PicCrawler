@@ -25,6 +25,22 @@ compile 'com.cv4j.piccrawler:crawler:0.2.2'
 
 Maven:
 
+当项目使用Maven进行构建时，在pom.xml文件中添加以下库
+
+```xml
+<repositories>
+    <repository>
+        <snapshots>
+            <enabled>false</enabled>
+        </snapshots>
+        <id>central</id>
+        <name>bintray</name>
+        <url>http://jcenter.bintray.com</url>
+    </repository>
+</repositories>
+```
+
+然后添加如下的依赖
 ```xml
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
