@@ -43,11 +43,8 @@ public class CrawlerClient {
     }
 
     public static CrawlerClient get() {
-        return Holder.CLIENT;
-    }
 
-    private static class Holder {
-        private static final CrawlerClient CLIENT = new CrawlerClient();
+        return new CrawlerClient();
     }
 
     /******************* CrawlerClient 的配置 Start *******************／
