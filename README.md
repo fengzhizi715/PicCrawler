@@ -4,9 +4,9 @@
 [ ![Download](https://api.bintray.com/packages/fengzhizi715/maven/crawler/images/download.svg) ](https://bintray.com/fengzhizi715/maven/crawler/_latestVersion)
 [![License](https://img.shields.io/badge/license-Apache%202-lightgrey.svg)](https://www.apache.org/licenses/LICENSE-2.0.html)
 
-用于抓取图片的爬虫，支持一些简单的定制
+用于抓取图片的爬虫，支持一些简单的定制比如User-Agent、referer、header、cookies等
 
-最初是为了批量抓取图片验证码，然后导入tensorflow进行训练，所以有了这个库。
+最初是为了批量抓取图片验证码，然后导入tensorflow进行训练，才有了这个库。
 
 # 下载安装:
 
@@ -229,4 +229,4 @@ Maven:
                 .downloadWebPageImages(urls);
 ```
 
-> 注意，如果图片有防盗链接，可以使用referer()方法，传入网站的网址。
+> 注意，如果图片有防盗链接，可以使用referer()方法，传入网站的网址。就可以愉快的下载图片了。
