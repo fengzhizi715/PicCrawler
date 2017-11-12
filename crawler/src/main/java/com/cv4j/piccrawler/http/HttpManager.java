@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler.http;
 
 import com.safframework.tony.common.utils.Preconditions;
+import lombok.Setter;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
@@ -44,6 +45,8 @@ public class HttpManager {
      */
     private static PoolingHttpClientConnectionManager connManager = null;
     private CloseableHttpClient httpClient;
+
+    @Setter
     private HttpParam httpParam;
 
     /**
@@ -99,15 +102,6 @@ public class HttpManager {
 
     public static HttpManager get() {
         return HttpManager.Holder.MANAGER;
-    }
-
-
-    public HttpParam getHttpParam() {
-        return httpParam;
-    }
-
-    public void setHttpParam(HttpParam httpParam) {
-        this.httpParam = httpParam;
     }
 
     /**
