@@ -168,6 +168,7 @@ public class CrawlerClient {
 
         if (isWebPage) {
 
+            // 如果是下载网页上的图片，则repeat不用起任何作用
             if (sleepTime>0) {
 
                 try {
