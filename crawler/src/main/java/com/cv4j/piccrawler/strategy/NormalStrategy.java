@@ -8,6 +8,10 @@ import com.cv4j.piccrawler.FileStrategy;
  */
 public abstract class NormalStrategy implements FileStrategy {
 
+    /**
+     * 指定文件名
+     * @return
+     */
     public abstract String fileName();
 
     @Override

@@ -8,9 +8,13 @@ import com.cv4j.piccrawler.FileStrategy;
  */
 public abstract class AutoIncrementStrategy implements FileStrategy {
 
+    /**
+     * 默认从1开始，子类可以重写该方法，指定自增长开始的数字
+     * @return
+     */
     public int start() {
 
-        return 0;
+        return 1;
     }
 
     public FileGenType genType(){
