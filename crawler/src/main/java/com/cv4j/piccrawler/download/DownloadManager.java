@@ -8,6 +8,7 @@ import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.FileUtils;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
+import lombok.Setter;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
@@ -18,10 +19,13 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Created by tony on 2017/10/27.
  */
+
 public class DownloadManager {
 
     private final static int BUFFER_SIZE = 0x2000; // 8192
     private static AtomicInteger count = new AtomicInteger();
+
+    @Setter
     private FileStrategy fileStrategy;
 
     private DownloadManager() {
@@ -29,14 +33,6 @@ public class DownloadManager {
 
     public static DownloadManager get() {
         return DownloadManager.Holder.DOWNLOAD_MANAGER;
-    }
-
-    public FileStrategy getFileStrategy() {
-        return fileStrategy;
-    }
-
-    public void setFileStrategy(FileStrategy fileStrategy) {
-        this.fileStrategy = fileStrategy;
     }
 
     /**
