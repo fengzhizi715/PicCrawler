@@ -35,6 +35,7 @@ public class CrawlerClient {
     private HttpManager httpManager;
     private DownloadManager downloadManager;
     private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder();
+    private boolean isWebPage = false;
 
     private CrawlerClient() {
 
@@ -165,7 +166,7 @@ public class CrawlerClient {
      */
     public void downloadPic(String url) {
 
-        for (int i = 0; i < repeat; i++) {
+        if (isWebPage) {
 
             if (sleepTime>0) {
 
@@ -177,6 +178,22 @@ public class CrawlerClient {
             }
 
             doDownloadPic(url);
+
+        } else {
+
+            for (int i = 0; i < repeat; i++) {
+
+                if (sleepTime>0) {
+
+                    try {
+                        Thread.sleep(sleepTime);
+                    } catch (InterruptedException exception) {
+                        exception.printStackTrace();
+                    }
+                }
+
+                doDownloadPic(url);
+            }
         }
     }
 
@@ -295,11 +312,16 @@ public class CrawlerClient {
      */
     public void downloadWebPageImages(String url) {
 
-        Flowable.just(url)
-                .map(s->httpManager.createHttpWithGet(s))
-                .map(response->parseHtmlToImages(response))
-                .subscribe(urls -> downloadPics(urls),
-                        throwable-> System.out.println(throwable.getMessage()));
+        if (Preconditions.isNotBlank(url)) {
+
+            isWebPage = true;
+
+            Flowable.just(url)
+                    .map(s->httpManager.createHttpWithGet(s))
+                    .map(response->parseHtmlToImages(response))
+                    .subscribe(urls -> downloadPics(urls),
+                            throwable-> System.out.println(throwable.getMessage()));
+        }
     }
 
     /**
@@ -309,6 +331,8 @@ public class CrawlerClient {
     public void downloadWebPageImages(List<String> urls) {
 
         if (Preconditions.isNotBlank(urls)) {
+
+            isWebPage = true;
 
             Flowable.fromIterable(urls)
                     .parallel()
