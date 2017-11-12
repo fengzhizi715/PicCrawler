@@ -294,7 +294,7 @@ public class HttpManager {
 
             if (proxy!=null) {
                 boolean check = checkProxy(proxy);
-                if (check) {
+                if (check) { // 代理检测成功，使用代理
                     httpClient = createHttpClient(timeOut,proxy,cookie);
                 } else {
                     httpClient = createHttpClient(timeOut,null,cookie);

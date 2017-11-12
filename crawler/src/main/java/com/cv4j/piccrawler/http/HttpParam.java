@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.http;
 
+import lombok.Getter;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
@@ -11,9 +12,16 @@ import java.util.Map;
  */
 public class HttpParam {
 
+    @Getter
     private int timeOut;
+
+    @Getter
     private HttpHost proxy;
+
+    @Getter
     private BasicClientCookie cookie;
+
+    @Getter
     private Map<String,String> header;
 
     private HttpParam(HttpParamBuilder builder) {
@@ -21,22 +29,6 @@ public class HttpParam {
         this.proxy = builder.proxy;
         this.cookie = builder.cookie;
         this.header = builder.header;
-    }
-
-    public int getTimeOut() {
-        return timeOut;
-    }
-
-    public HttpHost getProxy() {
-        return proxy;
-    }
-
-    public BasicClientCookie getCookie() {
-        return cookie;
-    }
-
-    public Map<String, String> getHeader() {
-        return header;
     }
 
     public static class HttpParamBuilder {
