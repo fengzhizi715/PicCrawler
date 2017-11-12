@@ -2,6 +2,7 @@ package com.cv4j.piccrawler.http;
 
 import com.safframework.tony.common.utils.Preconditions;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 import org.apache.http.client.CookieStore;
 import org.apache.http.client.config.AuthSchemes;
@@ -38,6 +39,7 @@ import java.util.Map;
 /**
  * Created by tony on 2017/10/19.
  */
+@Slf4j
 public class HttpManager {
 
     /**
@@ -48,6 +50,8 @@ public class HttpManager {
 
     @Setter
     private HttpParam httpParam;
+
+    private boolean proxyPool = false;
 
     /**
      * 配置连接池信息，支持http/https
@@ -160,7 +164,7 @@ public class HttpManager {
 
 
     /**
-     * 创建网络请求
+     * 创建网络请求 post请求
      * @param url
      * @return
      */
@@ -194,6 +198,11 @@ public class HttpManager {
         return response;
     }
 
+    /**
+     * 创建网络请求 get请求
+     * @param url
+     * @return
+     */
     public CloseableHttpResponse createHttpWithGet(String url) {
 
         // 获取客户端连接对象
@@ -289,8 +298,10 @@ public class HttpManager {
             if (proxy!=null) {
                 boolean check = checkProxy(proxy);
                 if (check) { // 代理检测成功，使用代理
+                    log.info("proxy："+proxy.toString()+" 代理可用");
                     httpClient = createHttpClient(timeOut,proxy,cookie);
                 } else {
+                    log.info("proxy："+proxy.toString()+" 代理不可用");
                     httpClient = createHttpClient(timeOut,null,cookie);
                 }
             } else {

@@ -120,9 +120,9 @@ public class CrawlerClient {
      * @param proxy 代理的host
      * @return
      */
-    public CrawlerClient proxy(HttpHost proxy) {
+    public CrawlerClient addProxy(HttpHost proxy) {
 
-        httpParamBuilder.proxy(proxy);
+        httpParamBuilder.addProxy(proxy);
         return this;
     }
 

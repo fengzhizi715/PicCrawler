@@ -4,8 +4,11 @@ import lombok.Getter;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Created by tony on 2017/10/27.
@@ -16,26 +19,49 @@ public class HttpParam {
     private int timeOut;
 
     @Getter
-    private HttpHost proxy;
-
-    @Getter
     private BasicClientCookie cookie;
 
     @Getter
     private Map<String,String> header;
 
+    private List<HttpHost> proxyPool;
+
+    private AtomicInteger index = new AtomicInteger();
+
     private HttpParam(HttpParamBuilder builder) {
         this.timeOut = builder.timeOut;
-        this.proxy = builder.proxy;
+        this.proxyPool = builder.proxyPool;
         this.cookie = builder.cookie;
         this.header = builder.header;
+    }
+
+    public HttpHost getProxy(){
+
+        HttpHost result = null;
+
+        if (getProxyPoolSize() > 0) {
+
+            if (index.get() > proxyPool.size()) {
+                index.set(0);
+            }
+
+            result = proxyPool.get(index.get());
+            index.incrementAndGet();
+        }
+
+        return result;
+    }
+
+    public int getProxyPoolSize() {
+
+        return proxyPool != null ? proxyPool.size() : 0;
     }
 
     public static class HttpParamBuilder {
 
         private int timeOut;
-        private HttpHost proxy;
         private BasicClientCookie cookie;
+        private List<HttpHost> proxyPool = new ArrayList<>();
         private Map<String,String> header = new HashMap<>();
 
         public HttpParamBuilder timeOut(int timeOut) {
@@ -43,8 +69,8 @@ public class HttpParam {
             return this;
         }
 
-        public HttpParamBuilder proxy(HttpHost proxy) {
-            this.proxy = proxy;
+        public HttpParamBuilder addProxy(HttpHost proxy) {
+            this.proxyPool.add(proxy);
             return this;
         }
 
