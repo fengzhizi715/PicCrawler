@@ -80,8 +80,9 @@ public class DownloadManager {
 
         String path = fileStrategy.filePath();
 
+        // 尝试获取图片的格式
         String format = Utils.tryToGetPicFormat(url);
-        // 优先使用url地址中图片的格式，如果不存在格式取fileStrategy的图片格式
+        // 如果能获取到图片的格式，优先使用url地址中图片的格式，如果不存在格式取fileStrategy的图片格式
         if (Preconditions.isBlank(format)) {
             format = fileStrategy.picFormat();
         }
@@ -149,8 +150,7 @@ public class DownloadManager {
             bos.write(byt, 0, len);
         }
 
-        IOUtils.closeQuietly(bos);
-        IOUtils.closeQuietly(bis);
+        IOUtils.closeQuietly(bos,bis);
 
         if (response != null) {
             try {
