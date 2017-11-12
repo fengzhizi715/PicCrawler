@@ -287,28 +287,61 @@ public class HttpManager {
 
     private CloseableHttpClient getHttpClient() {
 
-        if (httpClient!=null) return httpClient;
+        if (proxyPool) {
+            // 使用多个代理的情况
 
-        if (Preconditions.isNotBlank(httpParam)) {
+            if (Preconditions.isNotBlank(httpParam)) {
 
-            int timeOut = httpParam.getTimeOut();
-            HttpHost proxy = httpParam.getProxy();
-            BasicClientCookie cookie = httpParam.getCookie();
+                int timeOut = httpParam.getTimeOut();
+                HttpHost proxy = httpParam.getProxy(); // 随机取出代理
+                BasicClientCookie cookie = httpParam.getCookie();
 
-            if (proxy!=null) {
-                boolean check = checkProxy(proxy);
-                if (check) { // 代理检测成功，使用代理
-                    log.info("proxy："+proxy.toString()+" 代理可用");
-                    httpClient = createHttpClient(timeOut,proxy,cookie);
+                if (proxy!=null) {
+                    boolean check = checkProxy(proxy);
+                    if (check) { // 代理检测成功，使用代理
+                        log.info("proxy："+proxy.toString()+" 代理可用");
+                        httpClient = createHttpClient(timeOut,proxy,cookie);
+                    } else {
+                        log.info("proxy："+proxy.toString()+" 代理不可用");
+                        httpClient = createHttpClient(timeOut,null,cookie);
+                    }
                 } else {
-                    log.info("proxy："+proxy.toString()+" 代理不可用");
                     httpClient = createHttpClient(timeOut,null,cookie);
                 }
             } else {
-                httpClient = createHttpClient(timeOut,null,cookie);
+                httpClient = createHttpClient();
             }
         } else {
-            httpClient = createHttpClient();
+
+            if (httpClient!=null) return httpClient;
+
+            if (Preconditions.isNotBlank(httpParam)) {
+
+                int timeOut = httpParam.getTimeOut();
+                int proxySize = httpParam.getProxyPoolSize();
+
+                if (proxySize>1) {
+                    proxyPool = true;
+                }
+
+                HttpHost proxy = httpParam.getProxy();
+                BasicClientCookie cookie = httpParam.getCookie();
+
+                if (proxy!=null) {
+                    boolean check = checkProxy(proxy);
+                    if (check) { // 代理检测成功，使用代理
+                        log.info("proxy："+proxy.toString()+" 代理可用");
+                        httpClient = createHttpClient(timeOut,proxy,cookie);
+                    } else {
+                        log.info("proxy："+proxy.toString()+" 代理不可用");
+                        httpClient = createHttpClient(timeOut,null,cookie);
+                    }
+                } else {
+                    httpClient = createHttpClient(timeOut,null,cookie);
+                }
+            } else {
+                httpClient = createHttpClient();
+            }
         }
 
         return httpClient;

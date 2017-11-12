@@ -41,7 +41,7 @@ public class HttpParam {
 
         if (getProxyPoolSize() > 0) {
 
-            if (index.get() > proxyPool.size()) {
+            if (index.get() > proxyPool.size()-1) {
                 index.set(0);
             }
 
