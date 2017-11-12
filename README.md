@@ -229,4 +229,35 @@ Maven:
                 .downloadWebPageImages(urls);
 ```
 
+## 1.5 通过代理使用图片爬虫
+如果有多个代理的话，内部使用轮询的方式切换代理。
+
+```java
+        String url = ...; // 针对某一个网址
+        CrawlerClient.get()
+                .timeOut(6000)
+                .fileStrategy(new FileStrategy() {
+
+                    @Override
+                    public String filePath() {
+                        return "temp";
+                    }
+
+                    @Override
+                    public String picFormat() {
+                        return "png";
+                    }
+
+                    @Override
+                    public FileGenType genType() {
+
+                        return FileGenType.AUTO_INCREMENT;
+                    }
+                })
+                .addProxy(new HttpHost("xxx.xx.xx.xx",xxxx))
+                .addProxy(new HttpHost("xxx.xx.xx.xx",xxxx))
+                .build()
+                .downloadWebPageImages(url);
+```
+
 > 注意，如果图片有防盗链接，可以使用referer()方法，传入网站的网址。就可以愉快的下载图片了。
