@@ -6,9 +6,21 @@ package com.cv4j.piccrawler;
  */
 public interface FileStrategy {
 
+    /**
+     * 文件存放路径
+     * @return
+     */
     String filePath();
 
+    /**
+     * 图片保存的格式
+     * @return
+     */
     String picFormat();
 
+    /**
+     * 文件生成的策略
+     * @return
+     */
     FileGenType genType();
 }

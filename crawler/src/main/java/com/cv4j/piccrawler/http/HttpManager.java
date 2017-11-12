@@ -230,7 +230,12 @@ public class HttpManager {
         return response;
     }
 
-    public boolean checkProxy(HttpHost proxy) {
+    /**
+     * 检测代理是否可用
+     * @param proxy
+     * @return
+     */
+    private boolean checkProxy(HttpHost proxy) {
 
         if (proxy == null) return false;
 
@@ -300,7 +305,7 @@ public class HttpManager {
         } else {
             httpClient = createHttpClient();
         }
-        
+
         return httpClient;
     }
 
