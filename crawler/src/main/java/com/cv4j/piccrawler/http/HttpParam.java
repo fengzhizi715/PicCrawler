@@ -35,6 +35,10 @@ public class HttpParam {
         this.header = builder.header;
     }
 
+    /**
+     * 采用round robin算法来获取Proxy
+     * @return
+     */
     public HttpHost getProxy(){
 
         HttpHost result = null;
@@ -52,6 +56,10 @@ public class HttpParam {
         return result;
     }
 
+    /**
+     * 获取代理池中代理的数量，如果大于1则在HttpManager中开启代理池的功能
+     * @return
+     */
     public int getProxyPoolSize() {
 
         return proxyPool != null ? proxyPool.size() : 0;
