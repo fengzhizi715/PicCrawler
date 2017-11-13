@@ -180,9 +180,6 @@ public class Utils {
 
         try {
             URL url = new URL(urlString);
-            System.out.println();
-            System.out.println(url.getHost());
-
             return url.getProtocol() + "://" + url.getHost();
         } catch (MalformedURLException e) {
             e.printStackTrace();
