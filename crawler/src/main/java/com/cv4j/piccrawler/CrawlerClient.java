@@ -71,7 +71,7 @@ public class CrawlerClient {
     }
 
     /**
-     *
+     * 使用了autoReferer()，就不需要在使用referer()，比较适合懒人使用
      * @return
      */
     public CrawlerClient autoReferer() {
