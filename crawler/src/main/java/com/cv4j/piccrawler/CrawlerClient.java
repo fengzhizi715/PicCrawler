@@ -71,6 +71,16 @@ public class CrawlerClient {
     }
 
     /**
+     *
+     * @return
+     */
+    public CrawlerClient autoReferer() {
+
+        httpParamBuilder.autoReferer();
+        return this;
+    }
+
+    /**
      * @param timeOut 设置超时时间
      * @return
      */
@@ -207,7 +217,7 @@ public class CrawlerClient {
 
         try {
 
-            if (Preconditions.isNotBlank(httpParamBuilder.getHeader("Referer"))) { // 针对需要Referer的图片，我们使用Get请求
+            if (Preconditions.isNotBlank(httpParamBuilder.getHeader("Referer")) || httpParamBuilder.isAutoReferer()) { // 针对需要Referer的图片，我们使用Get请求
 
                 downloadManager.writeImageToFile(httpManager.createHttpWithGet(url),url);
             } else {

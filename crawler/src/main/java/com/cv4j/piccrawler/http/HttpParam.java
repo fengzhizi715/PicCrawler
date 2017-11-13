@@ -24,6 +24,9 @@ public class HttpParam {
     @Getter
     private Map<String,String> header;
 
+    @Getter
+    private boolean autoReferer;
+
     private List<HttpHost> proxyPool;
 
     private AtomicInteger index = new AtomicInteger();
@@ -33,6 +36,7 @@ public class HttpParam {
         this.proxyPool = builder.proxyPool;
         this.cookie = builder.cookie;
         this.header = builder.header;
+        this.autoReferer = builder.autoReferer;
     }
 
     /**
@@ -71,6 +75,7 @@ public class HttpParam {
         private BasicClientCookie cookie;
         private List<HttpHost> proxyPool = new ArrayList<>();
         private Map<String,String> header = new HashMap<>();
+        private boolean autoReferer = false;
 
         public HttpParamBuilder timeOut(int timeOut) {
             this.timeOut = timeOut;
@@ -80,6 +85,7 @@ public class HttpParam {
         public HttpParamBuilder addProxy(HttpHost proxy) {
             this.proxyPool.add(proxy);
             return this;
+
         }
 
         public HttpParamBuilder cookie(BasicClientCookie cookie) {
@@ -90,6 +96,15 @@ public class HttpParam {
         public HttpParamBuilder addHeader(String name,String value) {
             header.put(name,value);
             return this;
+        }
+
+        public HttpParamBuilder autoReferer() {
+            autoReferer = true;
+            return this;
+        }
+
+        public boolean isAutoReferer() {
+            return autoReferer;
         }
 
         public String getHeader(String name) {

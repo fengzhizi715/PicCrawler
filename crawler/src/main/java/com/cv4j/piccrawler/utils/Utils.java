@@ -1,10 +1,10 @@
 package com.cv4j.piccrawler.utils;
 
 import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * Created by tony on 2017/10/10.
@@ -174,5 +174,20 @@ public class Utils {
         }
 
         return url;
+    }
+
+    public static String getReferer(String urlString) {
+
+        try {
+            URL url = new URL(urlString);
+            System.out.println();
+            System.out.println(url.getHost());
+
+            return url.getProtocol() + "://" + url.getHost();
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }

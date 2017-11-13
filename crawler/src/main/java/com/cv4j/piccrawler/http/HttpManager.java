@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.http;
 
+import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.Preconditions;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -177,9 +178,17 @@ public class HttpManager {
 
         if (Preconditions.isNotBlank(httpParam)) {
 
+            boolean autoReferer = httpParam.isAutoReferer();
+
             Map<String,String> header = httpParam.getHeader();
 
             if (Preconditions.isNotBlank(header)) {
+
+                if (autoReferer && !header.containsKey("Referer")) {
+
+                    header.put("Referer", Utils.getReferer(url));
+                }
+
                 for (String key : header.keySet()) {
                     httpPost.setHeader(key,header.get(key));
                 }
@@ -212,9 +221,17 @@ public class HttpManager {
 
         if (Preconditions.isNotBlank(httpParam)) {
 
+            boolean autoReferer = httpParam.isAutoReferer();
+
             Map<String,String> header = httpParam.getHeader();
 
             if (Preconditions.isNotBlank(header)) {
+
+                if (autoReferer && !header.containsKey("Referer")) {
+
+                    header.put("Referer", Utils.getReferer(url));
+                }
+
                 for (String key : header.keySet()) {
                     httpGet.setHeader(key,header.get(key));
                 }
