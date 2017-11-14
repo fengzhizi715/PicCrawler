@@ -45,4 +45,9 @@ public class Proxy {
 
         return new HttpHost(ip,port);
     }
+
+    @Override
+    public String toString() {
+        return "ip="+ip+",port="+port;
+    }
 }
