@@ -121,6 +121,7 @@ public class DownloadManager {
 
             case AUTO_INCREMENT:
 
+                // 只针对AutoIncrementStrategy及其子类
                 if (fileStrategy instanceof AutoIncrementStrategy) {
 
                     if (count.get() < ((AutoIncrementStrategy) fileStrategy).start()) {

@@ -5,7 +5,7 @@ import org.jsoup.nodes.Document;
 /**
  * Created by tony on 2017/11/14.
  */
-public interface PageParser {
+public interface PageParser<T> {
 
     /**
      * parse html
@@ -13,5 +13,5 @@ public interface PageParser {
      * @param html page html data
      *
      */
-    void parse(Document html);
+    T parse(Document html);
 }

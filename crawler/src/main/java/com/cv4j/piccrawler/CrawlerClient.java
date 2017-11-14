@@ -4,7 +4,7 @@ import com.cv4j.piccrawler.download.DownloadManager;
 import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.http.HttpParam;
 import com.cv4j.piccrawler.download.strategy.FileStrategy;
-import com.cv4j.piccrawler.utils.Utils;
+import com.cv4j.piccrawler.parser.PicParser;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
 import io.reactivex.*;
@@ -17,8 +17,6 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.*;
 import java.util.*;
@@ -371,6 +369,11 @@ public class CrawlerClient {
         }
     }
 
+    /**
+     * 将response进行解析，解析出图片的url，存放到List中
+     * @param response
+     * @return
+     */
     private List<String> parseHtmlToImages(CloseableHttpResponse response) {
 
         // 获取响应实体
@@ -388,29 +391,9 @@ public class CrawlerClient {
 
         Document doc = Jsoup.parse(html);
 
-        Elements media = doc.select("[src]");
-        List<String> urls = new ArrayList<>();
+        PicParser picParser = new PicParser();
 
-        if (Preconditions.isNotBlank(media)) {
-
-            for (Element src : media) {
-                if (src.tagName().equals("img")) {
-
-                    if (Preconditions.isNotBlank(src.attr("abs:src"))) { // 图片的绝对路径不为空
-
-                        String picUrl = src.attr("abs:src");
-                        log.info(picUrl);
-                        urls.add(picUrl);
-                    } else if (Preconditions.isNotBlank(src.attr("src"))){ // 图片的相对路径不为空
-
-                        String picUrl = src.attr("src").replace("//","");
-                        picUrl = "http://"+Utils.tryToEscapeUrl(picUrl);
-                        log.info(picUrl);
-                        urls.add(picUrl);
-                    }
-                }
-            }
-        }
+        List<String> urls = picParser.parse(doc);
 
         if (response != null) {
             try {
