@@ -1,6 +1,13 @@
 PicCrawler
 ===
 
+Version 0.4.0
+---
+2017-11-14
+ *  增加autoReferer功能
+ *  增加Parser层，方便以后扩展成自定义图片Parser
+ *  调整结构将strategy包放到download包下
+
 Version 0.3.0
 ---
 2017-11-12
