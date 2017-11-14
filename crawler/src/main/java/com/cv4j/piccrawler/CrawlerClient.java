@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler;
 
+import com.cv4j.piccrawler.domain.Proxy;
 import com.cv4j.piccrawler.download.DownloadManager;
 import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.http.HttpParam;
@@ -132,7 +133,7 @@ public class CrawlerClient {
      * @param proxy 代理的host
      * @return
      */
-    public CrawlerClient addProxy(HttpHost proxy) {
+    public CrawlerClient addProxy(Proxy proxy) {
 
         httpParamBuilder.addProxy(proxy);
         return this;
@@ -143,7 +144,7 @@ public class CrawlerClient {
      * @param proxyList 代理的host的列表
      * @return
      */
-    public CrawlerClient addProxyPool(List<HttpHost> proxyList) {
+    public CrawlerClient addProxyPool(List<Proxy> proxyList) {
 
         httpParamBuilder.addProxyPool(proxyList);
         return this;

@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.http;
 
+import com.cv4j.piccrawler.domain.Proxy;
 import lombok.Getter;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -28,7 +29,7 @@ public class HttpParam {
     @Getter
     private boolean autoReferer;
 
-    private List<HttpHost> proxyPool;
+    private List<Proxy> proxyPool;
 
     private AtomicInteger index = new AtomicInteger();
 
@@ -44,9 +45,9 @@ public class HttpParam {
      * 采用round robin算法来获取Proxy
      * @return
      */
-    public HttpHost getProxy(){
+    public Proxy getProxy(){
 
-        HttpHost result = null;
+        Proxy result = null;
 
         if (getProxyPoolSize() > 0) {
 
@@ -74,7 +75,7 @@ public class HttpParam {
 
         private int timeOut;
         private BasicClientCookie cookie;
-        private List<HttpHost> proxyPool = new CopyOnWriteArrayList<>();
+        private List<Proxy> proxyPool = new CopyOnWriteArrayList<>();
         private Map<String,String> header = new HashMap<>();
         private boolean autoReferer = false;
 
@@ -83,12 +84,12 @@ public class HttpParam {
             return this;
         }
 
-        public HttpParamBuilder addProxy(HttpHost proxy) {
+        public HttpParamBuilder addProxy(Proxy proxy) {
             this.proxyPool.add(proxy);
             return this;
         }
 
-        public HttpParamBuilder addProxyPool(List<HttpHost> proxyList) {
+        public HttpParamBuilder addProxyPool(List<Proxy> proxyList) {
             this.proxyPool.addAll(proxyList);
             return this;
         }

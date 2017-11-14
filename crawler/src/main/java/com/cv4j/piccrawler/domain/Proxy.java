@@ -1,5 +1,9 @@
 package com.cv4j.piccrawler.domain;
 
+import lombok.Getter;
+import lombok.Setter;
+import org.apache.http.HttpHost;
+
 /**
  * Created by tony on 2017/11/14.
  */
@@ -8,7 +12,21 @@ public class Proxy {
     private String ip;
     private int port;
     private String scheme;
+
+    @Getter
+    @Setter
     private int failureTimes;//请求失败次数
+
+    public Proxy(String ip,int port) {
+        this.ip = ip;
+        this.port = port;
+    }
+
+    public Proxy(String ip,int port,String scheme) {
+        this.ip = ip;
+        this.port = port;
+        this.scheme = scheme;
+    }
 
     /**
      * 是否丢弃代理
@@ -16,9 +34,15 @@ public class Proxy {
      */
     public boolean isDiscardProxy(){
 
-        if(failureTimes >= 3){
-            return true;
-        }
-        return false;
+        return failureTimes>3?true:false;
+    }
+
+    /**
+     * 返回一个HttpHost对象
+     * @return
+     */
+    public HttpHost toHttpHost() {
+
+        return new HttpHost(ip,port);
     }
 }

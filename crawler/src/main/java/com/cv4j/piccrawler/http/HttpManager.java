@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.http;
 
+import com.cv4j.piccrawler.domain.Proxy;
 import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.Preconditions;
 import lombok.Setter;
@@ -52,7 +53,7 @@ public class HttpManager {
     @Setter
     private HttpParam httpParam;
 
-    private boolean proxyPool = false;
+    private boolean useProxyPool = false;
 
     /**
      * 配置连接池信息，支持http/https
@@ -304,20 +305,21 @@ public class HttpManager {
 
     private CloseableHttpClient getHttpClient() {
 
-        if (proxyPool) {
+        if (useProxyPool) {
             // 使用多个代理的情况
 
             if (Preconditions.isNotBlank(httpParam)) {
 
                 int timeOut = httpParam.getTimeOut();
-                HttpHost proxy = httpParam.getProxy(); // 随机取出代理
+                Proxy proxy = httpParam.getProxy(); // 随机取出代理
                 BasicClientCookie cookie = httpParam.getCookie();
 
                 if (proxy!=null) {
-                    boolean check = checkProxy(proxy);
+                    HttpHost httpHost = proxy.toHttpHost();
+                    boolean check = checkProxy(httpHost);
                     if (check) { // 代理检测成功，使用代理
                         log.info("proxy："+proxy.toString()+" 代理可用");
-                        httpClient = createHttpClient(timeOut,proxy,cookie);
+                        httpClient = createHttpClient(timeOut,httpHost,cookie);
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
                         httpClient = createHttpClient(timeOut,null,cookie);
@@ -338,17 +340,18 @@ public class HttpManager {
                 int proxySize = httpParam.getProxyPoolSize();
 
                 if (proxySize>1) {
-                    proxyPool = true;
+                    useProxyPool = true;
                 }
 
-                HttpHost proxy = httpParam.getProxy();
+                Proxy proxy = httpParam.getProxy();
                 BasicClientCookie cookie = httpParam.getCookie();
 
                 if (proxy!=null) {
-                    boolean check = checkProxy(proxy);
+                    HttpHost httpHost = proxy.toHttpHost();
+                    boolean check = checkProxy(httpHost);
                     if (check) { // 代理检测成功，使用代理
                         log.info("proxy："+proxy.toString()+" 代理可用");
-                        httpClient = createHttpClient(timeOut,proxy,cookie);
+                        httpClient = createHttpClient(timeOut,httpHost,cookie);
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
                         httpClient = createHttpClient(timeOut,null,cookie);
