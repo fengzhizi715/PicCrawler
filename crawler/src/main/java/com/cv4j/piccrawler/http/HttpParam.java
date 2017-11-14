@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -73,7 +74,7 @@ public class HttpParam {
 
         private int timeOut;
         private BasicClientCookie cookie;
-        private List<HttpHost> proxyPool = new ArrayList<>();
+        private List<HttpHost> proxyPool = new CopyOnWriteArrayList<>();
         private Map<String,String> header = new HashMap<>();
         private boolean autoReferer = false;
 
