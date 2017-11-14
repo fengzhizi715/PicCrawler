@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler.strategy;
+package com.cv4j.piccrawler.download.strategy;
 
 /**
  * 文件策略，包含生成的路径、格式、文件名的生成策略

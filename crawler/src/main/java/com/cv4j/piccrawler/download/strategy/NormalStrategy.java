@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler.strategy;
+package com.cv4j.piccrawler.download.strategy;
 
 /**
  * Created by tony on 2017/10/13.

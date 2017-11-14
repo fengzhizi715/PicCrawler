@@ -1,9 +1,9 @@
 package com.cv4j.piccrawler.download;
 
-import com.cv4j.piccrawler.strategy.FileGenType;
-import com.cv4j.piccrawler.strategy.FileStrategy;
-import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
-import com.cv4j.piccrawler.strategy.NormalStrategy;
+import com.cv4j.piccrawler.download.strategy.FileGenType;
+import com.cv4j.piccrawler.download.strategy.FileStrategy;
+import com.cv4j.piccrawler.download.strategy.AutoIncrementStrategy;
+import com.cv4j.piccrawler.download.strategy.NormalStrategy;
 import com.cv4j.piccrawler.utils.Utils;
 import com.safframework.tony.common.utils.FileUtils;
 import com.safframework.tony.common.utils.IOUtils;
