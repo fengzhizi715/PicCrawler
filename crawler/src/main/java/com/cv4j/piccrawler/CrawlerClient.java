@@ -101,7 +101,7 @@ public class CrawlerClient {
     }
 
     /**
-     * @param repeat 设置重复次数
+     * @param repeat 设置重复次数，只对单个图片有效，对下载网页中的图片无效。
      * @return
      */
     public CrawlerClient repeat(int repeat) {
@@ -160,7 +160,7 @@ public class CrawlerClient {
     }
 
     /**
-     *
+     * 添加header
      * @param name
      * @param value
      * @return
@@ -171,6 +171,10 @@ public class CrawlerClient {
         return this;
     }
 
+    /**
+     * 对于CrawlerClient必须要使用builder()，设置的一些配置就无效了
+     * @return
+     */
     public CrawlerClient build() {
 
         httpManager.setHttpParam(httpParamBuilder.build());
