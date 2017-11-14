@@ -4,6 +4,7 @@ import com.cv4j.piccrawler.download.DownloadManager;
 import com.cv4j.piccrawler.http.HttpManager;
 import com.cv4j.piccrawler.http.HttpParam;
 import com.cv4j.piccrawler.download.strategy.FileStrategy;
+import com.cv4j.piccrawler.parser.PageParser;
 import com.cv4j.piccrawler.parser.PicParser;
 import com.safframework.tony.common.utils.IOUtils;
 import com.safframework.tony.common.utils.Preconditions;
@@ -35,6 +36,7 @@ public class CrawlerClient {
     private DownloadManager downloadManager;   // 下载的管理类
     private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder(); // 网络请求的参数builder
     private boolean isWebPage = false;         // 是否下载网页的图片
+    private PageParser pageParser;
 
     private CrawlerClient() {
 
@@ -341,9 +343,11 @@ public class CrawlerClient {
 
             isWebPage = true;
 
+            pageParser = new PicParser();
+
             Flowable.just(url)
                     .map(s->httpManager.createHttpWithGet(s))
-                    .map(response->parseHtmlToImages(response))
+                    .map(response->parseHtmlToImages(response,(PicParser)pageParser))
                     .subscribe(urls -> downloadPics(urls),
                             throwable-> System.out.println(throwable.getMessage()));
         }
@@ -359,10 +363,12 @@ public class CrawlerClient {
 
             isWebPage = true;
 
+            pageParser = new PicParser();
+
             Flowable.fromIterable(urls)
                     .parallel()
                     .map(url->httpManager.createHttpWithGet(url))
-                    .map(response->parseHtmlToImages(response))
+                    .map(response->parseHtmlToImages(response,(PicParser)pageParser))
                     .sequential()
                     .subscribe(list -> downloadPics(list),
                             throwable-> System.out.println(throwable.getMessage()));
@@ -372,9 +378,10 @@ public class CrawlerClient {
     /**
      * 将response进行解析，解析出图片的url，存放到List中
      * @param response
+     * @param picParser
      * @return
      */
-    private List<String> parseHtmlToImages(CloseableHttpResponse response) {
+    private List<String> parseHtmlToImages(CloseableHttpResponse response,PicParser picParser) {
 
         // 获取响应实体
         HttpEntity entity = response.getEntity();
@@ -390,8 +397,6 @@ public class CrawlerClient {
         }
 
         Document doc = Jsoup.parse(html);
-
-        PicParser picParser = new PicParser();
 
         List<String> urls = picParser.parse(doc);
 
