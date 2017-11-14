@@ -22,7 +22,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class DownloadManager {
 
-    private final static int BUFFER_SIZE = 0x2000; // 8192
     private static AtomicInteger count = new AtomicInteger();
 
     @Setter
@@ -53,9 +52,6 @@ public class DownloadManager {
         if (entity==null) return null;
 
         InputStream is = entity.getContent();
-
-        // 包装成高效流
-        BufferedInputStream bis = new BufferedInputStream(is);
 
         if (fileStrategy == null) {
             fileStrategy = new FileStrategy() {
@@ -143,15 +139,9 @@ public class DownloadManager {
 
         File file = new File(directory, fileName + "." + format);
 
-        BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+        IOUtils.writeToFile(is,file); // 将inputStream写入文件
 
-        byte[] byt = new byte[BUFFER_SIZE];
-        Integer len = -1;
-        while ((len = bis.read(byt)) != -1) {
-            bos.write(byt, 0, len);
-        }
-
-        IOUtils.closeQuietly(bos,bis);
+        IOUtils.closeQuietly(is);
 
         if (response != null) {
             try {
