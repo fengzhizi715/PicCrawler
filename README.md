@@ -21,7 +21,7 @@ repositories {
 Gradle:
 
 ```groovy
-compile 'com.cv4j.piccrawler:crawler:0.4.0'
+compile 'com.cv4j.piccrawler:crawler:0.4.1'
 ```
 
 
@@ -47,7 +47,7 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.4.0</version>
+  <version>0.4.1</version>
   <type>pom</type>
 </dependency>
 ```
@@ -254,8 +254,8 @@ Maven:
                         return FileGenType.AUTO_INCREMENT;
                     }
                 })
-                .addProxy(new HttpHost("xxx.xx.xx.xx",xxxx))
-                .addProxy(new HttpHost("xxx.xx.xx.xx",xxxx))
+                .addProxy(new Proxy("xxx.xx.xx.xx",xxxx))
+                .addProxy(new Proxy("xxx.xx.xx.xx",xxxx))
                 .build()
                 .downloadWebPageImages(url);
 ```
