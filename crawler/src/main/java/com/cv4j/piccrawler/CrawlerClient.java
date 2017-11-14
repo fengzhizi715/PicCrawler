@@ -139,6 +139,17 @@ public class CrawlerClient {
 
     /**
      *
+     * @param proxyList 代理的host的列表
+     * @return
+     */
+    public CrawlerClient addProxyPool(List<HttpHost> proxyList) {
+
+        httpParamBuilder.addProxyPool(proxyList);
+        return this;
+    }
+
+    /**
+     *
      * @param cookie 设置浏览器的cookie
      * @return
      */

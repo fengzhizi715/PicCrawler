@@ -86,7 +86,11 @@ public class HttpParam {
         public HttpParamBuilder addProxy(HttpHost proxy) {
             this.proxyPool.add(proxy);
             return this;
+        }
 
+        public HttpParamBuilder addProxyPool(List<HttpHost> proxyList) {
+            this.proxyPool.addAll(proxyList);
+            return this;
         }
 
         public HttpParamBuilder cookie(BasicClientCookie cookie) {
