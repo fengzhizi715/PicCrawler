@@ -1,7 +1,7 @@
 package com.cv4j.piccrawler.download;
 
-import com.cv4j.piccrawler.FileGenType;
-import com.cv4j.piccrawler.FileStrategy;
+import com.cv4j.piccrawler.strategy.FileGenType;
+import com.cv4j.piccrawler.strategy.FileStrategy;
 import com.cv4j.piccrawler.strategy.AutoIncrementStrategy;
 import com.cv4j.piccrawler.strategy.NormalStrategy;
 import com.cv4j.piccrawler.utils.Utils;

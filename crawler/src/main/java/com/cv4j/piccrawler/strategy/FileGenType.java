@@ -1,4 +1,4 @@
-package com.cv4j.piccrawler;
+package com.cv4j.piccrawler.strategy;
 
 /**
  * 生成文件名的枚举方法
