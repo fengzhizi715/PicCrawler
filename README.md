@@ -259,8 +259,13 @@ Maven:
                 .build()
                 .downloadWebPageImages(url);
 ```
+CrawlerClient也支持使用addProxyPool()传递一个代理列表。
 
-> 注意，如果图片有防盗链接，可以使用referer()方法，传入网站的网址。就可以愉快的下载图片了。
+## 1.6 针对防盗链的图片
+
+如果图片有防盗链接，可以使用referer()方法，传入网站的网址。就可以愉快的下载图片了。
+
+对于懒人还有一个方法autoReferer()，可以不必传入网站的网址。
 
 # ChangeLog
 [版本更新记录](CHANGELOG.md)
