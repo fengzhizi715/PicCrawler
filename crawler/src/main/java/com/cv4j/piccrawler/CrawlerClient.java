@@ -29,12 +29,12 @@ import java.util.concurrent.ExecutionException;
 @Slf4j
 public class CrawlerClient {
 
-    private int repeat = 1;
-    private int sleepTime = 0;
-    private HttpManager httpManager;
-    private DownloadManager downloadManager;
-    private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder();
-    private boolean isWebPage = false;
+    private int repeat = 1;                    // 下载单张图片的重复次数，对下载网页中对图片无效
+    private int sleepTime = 0;                 // 每次请求url时先sleep一段时间
+    private HttpManager httpManager;           // 网络框架的管理类
+    private DownloadManager downloadManager;   // 下载的管理类
+    private HttpParam.HttpParamBuilder httpParamBuilder = new HttpParam.HttpParamBuilder(); // 网络请求的参数builder
+    private boolean isWebPage = false;         // 是否下载网页的图片
 
     private CrawlerClient() {
 
