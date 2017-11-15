@@ -1,4 +1,5 @@
 rootProject.name = 'piccrawler'
 include 'crawler'
 include 'crawler-selenium'
+include 'crawler-kotlin'
 
