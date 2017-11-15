@@ -322,6 +322,7 @@ public class HttpManager {
                         httpClient = createHttpClient(timeOut,httpHost,cookie);
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
+                        proxy.setFailureTimes(proxy.getFailureTimes()+1);
                         httpClient = createHttpClient(timeOut,null,cookie);
                     }
                 } else {
@@ -354,6 +355,7 @@ public class HttpManager {
                         httpClient = createHttpClient(timeOut,httpHost,cookie);
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
+                        proxy.setFailureTimes(proxy.getFailureTimes()+1);
                         httpClient = createHttpClient(timeOut,null,cookie);
                     }
                 } else {

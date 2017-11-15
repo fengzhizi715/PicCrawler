@@ -29,6 +29,7 @@ public class HttpParam {
     @Getter
     private boolean autoReferer;
 
+    @Getter
     private List<Proxy> proxyPool;
 
     private AtomicInteger index = new AtomicInteger();
