@@ -323,6 +323,10 @@ public class HttpManager {
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
                         proxy.setFailureTimes(proxy.getFailureTimes()+1);
+                        if (proxy.isDiscardProxy()) {
+                            log.info("proxy："+proxy.toString()+"被丢弃");
+                            httpParam.getProxyPool().remove(proxy);
+                        }
                         httpClient = createHttpClient(timeOut,null,cookie);
                     }
                 } else {
@@ -356,6 +360,10 @@ public class HttpManager {
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
                         proxy.setFailureTimes(proxy.getFailureTimes()+1);
+                        if (proxy.isDiscardProxy()) {
+                            log.info("proxy："+proxy.toString()+"被丢弃");
+                            httpParam.getProxyPool().remove(proxy);
+                        }
                         httpClient = createHttpClient(timeOut,null,cookie);
                     }
                 } else {
