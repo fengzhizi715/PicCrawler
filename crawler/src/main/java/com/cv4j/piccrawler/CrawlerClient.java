@@ -57,7 +57,9 @@ public class CrawlerClient {
      */
     public CrawlerClient ua(String userAgent) {
 
-        addHeader("User-Agent",userAgent);
+        if (Preconditions.isNotBlank(userAgent)) {
+            addHeader("User-Agent",userAgent);
+        }
         return this;
     }
 
@@ -67,7 +69,9 @@ public class CrawlerClient {
      */
     public CrawlerClient referer(String referer) {
 
-        addHeader("Referer",referer);
+        if (Preconditions.isNotBlank(referer)) {
+            addHeader("Referer",referer);
+        }
         return this;
     }
 
@@ -87,7 +91,9 @@ public class CrawlerClient {
      */
     public CrawlerClient timeOut(int timeOut) {
 
-        httpParamBuilder.timeOut(timeOut);
+        if (timeOut>0) {
+            httpParamBuilder.timeOut(timeOut);
+        }
         return this;
     }
 
@@ -97,7 +103,9 @@ public class CrawlerClient {
      */
     public CrawlerClient fileStrategy(FileStrategy fileStrategy) {
 
-        downloadManager.setFileStrategy(fileStrategy);
+        if (fileStrategy!=null) {
+            downloadManager.setFileStrategy(fileStrategy);
+        }
         return this;
     }
 
@@ -110,7 +118,6 @@ public class CrawlerClient {
         if (repeat > 0) {
             this.repeat = repeat;
         }
-
         return this;
     }
 
@@ -123,7 +130,6 @@ public class CrawlerClient {
         if (sleepTime > 0) {
             this.sleepTime = sleepTime;
         }
-
         return this;
     }
 
@@ -134,7 +140,9 @@ public class CrawlerClient {
      */
     public CrawlerClient addProxy(Proxy proxy) {
 
-        httpParamBuilder.addProxy(proxy);
+        if (proxy!=null) {
+            httpParamBuilder.addProxy(proxy);
+        }
         return this;
     }
 
@@ -145,7 +153,9 @@ public class CrawlerClient {
      */
     public CrawlerClient addProxyPool(List<Proxy> proxyList) {
 
-        httpParamBuilder.addProxyPool(proxyList);
+        if (Preconditions.isNotBlank(proxyList)) {
+            httpParamBuilder.addProxyPool(proxyList);
+        }
         return this;
     }
 
@@ -156,7 +166,9 @@ public class CrawlerClient {
      */
     public CrawlerClient cookie(BasicClientCookie cookie) {
 
-        httpParamBuilder.cookie(cookie);
+        if (Preconditions.isNotBlank(cookie)) {
+            httpParamBuilder.cookie(cookie);
+        }
         return this;
     }
 

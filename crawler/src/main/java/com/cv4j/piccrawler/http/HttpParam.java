@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler.http;
 
 import com.cv4j.piccrawler.domain.Proxy;
+import com.cv4j.piccrawler.utils.NoEmptyHashMap;
 import lombok.Getter;
 import org.apache.http.HttpHost;
 import org.apache.http.impl.cookie.BasicClientCookie;
@@ -77,7 +78,7 @@ public class HttpParam {
         private int timeOut;
         private BasicClientCookie cookie;
         private List<Proxy> proxyPool = new CopyOnWriteArrayList<>();
-        private Map<String,String> header = new HashMap<>();
+        private Map<String,String> header = new NoEmptyHashMap<>();
         private boolean autoReferer = false;
 
         public HttpParamBuilder timeOut(int timeOut) {
