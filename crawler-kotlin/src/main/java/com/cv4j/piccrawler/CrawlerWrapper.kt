@@ -39,3 +39,23 @@ private fun doDownloadPic(wrap: CrawlerWrapper) {
             .build()
             .downloadPic(wrap.url)
 }
+
+fun downloadWebPageImages(init: CrawlerWrapper.() -> Unit) {
+
+    val wrap = CrawlerWrapper()
+
+    wrap.init()
+
+    doDownloadWebPageImages(wrap)
+}
+
+private fun doDownloadWebPageImages(wrap: CrawlerWrapper) {
+
+    CrawlerClient.get()
+            .ua(wrap.ua)
+            .referer(wrap.ua)
+            .timeOut(wrap.timeOut)
+            .fileStrategy(wrap.fileStrategy)
+            .build()
+            .downloadWebPageImages(wrap.url)
+}
