@@ -13,6 +13,8 @@ class CrawlerWrapper {
 
     var referer:String? = null
 
+    var autoReferer:Boolean = false
+
     var timeOut:Int = 0
 
     var repeat:Int = 0
@@ -30,14 +32,25 @@ fun downloadPic(init: CrawlerWrapper.() -> Unit) {
 
 private fun doDownloadPic(wrap: CrawlerWrapper) {
 
-    CrawlerClient.get()
-            .ua(wrap.ua)
-            .referer(wrap.ua)
-            .timeOut(wrap.timeOut)
-            .repeat(wrap.repeat)
-            .fileStrategy(wrap.fileStrategy)
-            .build()
-            .downloadPic(wrap.url)
+    if (wrap.autoReferer && wrap.referer.isNullOrBlank()) {
+        CrawlerClient.get()
+                .ua(wrap.ua)
+                .autoReferer()
+                .timeOut(wrap.timeOut)
+                .repeat(wrap.repeat)
+                .fileStrategy(wrap.fileStrategy)
+                .build()
+                .downloadPic(wrap.url)
+    } else {
+        CrawlerClient.get()
+                .ua(wrap.ua)
+                .referer(wrap.referer)
+                .timeOut(wrap.timeOut)
+                .repeat(wrap.repeat)
+                .fileStrategy(wrap.fileStrategy)
+                .build()
+                .downloadPic(wrap.url)
+    }
 }
 
 fun downloadWebPageImages(init: CrawlerWrapper.() -> Unit) {
@@ -51,11 +64,22 @@ fun downloadWebPageImages(init: CrawlerWrapper.() -> Unit) {
 
 private fun doDownloadWebPageImages(wrap: CrawlerWrapper) {
 
-    CrawlerClient.get()
-            .ua(wrap.ua)
-            .referer(wrap.ua)
-            .timeOut(wrap.timeOut)
-            .fileStrategy(wrap.fileStrategy)
-            .build()
-            .downloadWebPageImages(wrap.url)
+    if (wrap.autoReferer && wrap.referer.isNullOrBlank()) {
+        CrawlerClient.get()
+                .ua(wrap.ua)
+                .autoReferer()
+                .timeOut(wrap.timeOut)
+                .fileStrategy(wrap.fileStrategy)
+                .build()
+                .downloadWebPageImages(wrap.url)
+    } else {
+        CrawlerClient.get()
+                .ua(wrap.ua)
+                .referer(wrap.ua)
+                .timeOut(wrap.timeOut)
+                .fileStrategy(wrap.fileStrategy)
+                .build()
+                .downloadWebPageImages(wrap.url)
+    }
+
 }
