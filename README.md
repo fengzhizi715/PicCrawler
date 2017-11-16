@@ -261,13 +261,42 @@ Maven:
 ```
 CrawlerClient也支持使用addProxyPool()传递一个代理列表。
 
-爬虫在工作中，发现代理不可用，内部有策略会从代理池中丢弃该代理。
+爬虫在工作中，如果发现代理不可用内部会有策略会代理池中丢弃该不可用的代理。
 
 ## 1.6 针对防盗链的图片
 
 如果图片有防盗链接，可以使用referer()方法，传入网站的网址。就可以愉快的下载图片了。
 
 对于懒人还有一个方法autoReferer()，可以不必传入网站的网址。
+
+## 1.7 增加对Kotlin的支持,可以使用DSL的方式来使用图片爬虫
+
+1. 下载单张图片
+
+```kotlin
+fun main(args: Array<String>) {
+
+    downloadPic {
+        url = "..."
+        timeOut = 6000
+        repeat = 20
+    }
+}
+```
+
+2. 下载某个网页的全部图片
+
+```kotlin
+fun main(args: Array<String>) {
+
+    downloadWebPageImages {
+
+        url = "..."
+        timeOut = 6000
+        autoReferer = true
+    }
+}
+```
 
 # ChangeLog
 [版本更新记录](CHANGELOG.md)
