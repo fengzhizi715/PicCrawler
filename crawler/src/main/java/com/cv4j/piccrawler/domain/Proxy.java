@@ -20,6 +20,7 @@ public class Proxy {
     public Proxy(String ip,int port) {
         this.ip = ip;
         this.port = port;
+        this.scheme = "http";
     }
 
     public Proxy(String ip,int port,String scheme) {
@@ -34,7 +35,7 @@ public class Proxy {
      */
     public boolean isDiscardProxy(){
 
-        return failureTimes>3?true:false;
+        return failureTimes>3;
     }
 
     /**
@@ -43,11 +44,11 @@ public class Proxy {
      */
     public HttpHost toHttpHost() {
 
-        return new HttpHost(ip,port);
+        return new HttpHost(ip,port,scheme);
     }
 
     @Override
     public String toString() {
-        return "ip="+ip+",port="+port;
+        return "ip="+ip+",port="+port+",scheme="+scheme;
     }
 }
