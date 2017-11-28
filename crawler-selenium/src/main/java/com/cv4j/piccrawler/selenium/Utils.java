@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler.selenium;
 
 import com.safframework.tony.common.utils.IOUtils;
+import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.OutputType;
 import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
@@ -36,5 +37,15 @@ public class Utils {
 
         //关闭浏览器
         driver.quit();
+    }
+
+    /**
+     * 浏览器向下滚动
+     * @param driver
+     */
+    public static void scrollDown(WebDriver driver) {
+
+        JavascriptExecutor js = (JavascriptExecutor)driver;
+        js.executeScript("scrollTo(0,10000)");
     }
 }
