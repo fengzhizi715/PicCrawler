@@ -32,13 +32,17 @@ public class PicParser implements PageParser<List<String>>{
 
                         String picUrl = src.attr("abs:src");
                         log.info(picUrl);
-                        urls.add(picUrl);
+                        if (Utils.isValidUrl(picUrl)) {
+                            urls.add(picUrl);
+                        }
                     } else if (Preconditions.isNotBlank(src.attr("src"))){ // 图片的相对路径不为空
 
                         String picUrl = src.attr("src").replace("//","");
                         picUrl = "http://"+ Utils.tryToEscapeUrl(picUrl);
                         log.info(picUrl);
-                        urls.add(picUrl);
+                        if (Utils.isValidUrl(picUrl)) {
+                            urls.add(picUrl);
+                        }
                     }
                 }
             }

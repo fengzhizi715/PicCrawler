@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 
 import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.net.URL;
+import java.net.*;
 import java.util.HashMap;
 import java.util.UUID;
 
@@ -203,6 +200,29 @@ public class Utils {
         }
 
         return null;
+    }
+
+    /**
+     * 判断是否合法的url
+     * @param urlString
+     * @return
+     */
+    public static boolean isValidUrl(String urlString) {
+        URI uri = null;
+        try {
+            uri = new URI(urlString);
+        } catch (URISyntaxException e) {
+            e.printStackTrace();
+            return false;
+        }
+
+        if (uri.getHost() == null) {
+            return false;
+        }
+        if (uri.getScheme().equalsIgnoreCase("http") || uri.getScheme().equalsIgnoreCase("https")) {
+            return true;
+        }
+        return false;
     }
 
     /**
