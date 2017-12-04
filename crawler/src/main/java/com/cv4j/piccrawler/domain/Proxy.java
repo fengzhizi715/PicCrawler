@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.domain;
 
+import com.safframework.tony.common.utils.Preconditions;
 import lombok.Getter;
 import lombok.Setter;
 import org.apache.http.HttpHost;
@@ -26,7 +27,11 @@ public class Proxy {
     public Proxy(String ip,int port,String scheme) {
         this.ip = ip;
         this.port = port;
-        this.scheme = scheme;
+        if (Preconditions.isBlank(scheme)) {
+            this.scheme = "http";
+        } else {
+            this.scheme = scheme;
+        }
     }
 
     /**
@@ -39,7 +44,7 @@ public class Proxy {
     }
 
     /**
-     * 返回一个HttpHost对象
+     * 将Proxy转换成一个HttpHost对象
      * @return
      */
     public HttpHost toHttpHost() {
@@ -49,6 +54,7 @@ public class Proxy {
 
     @Override
     public String toString() {
+
         return "ip="+ip+",port="+port+",scheme="+scheme;
     }
 }

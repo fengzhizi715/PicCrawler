@@ -268,14 +268,14 @@ public class HttpManager {
             socket.connect(endpointSocketAddr, 3000);
             return true;
         } catch (IOException e) {
-//            logger.warn("FAILRE - CAN not connect!  remote: " + p);
+            log.warn("FAILRE - CAN not connect!  remote: " + proxy);
             return false;
         } finally {
             if (socket != null) {
                 try {
                     socket.close();
                 } catch (IOException e) {
-//                    logger.warn("Error occurred while closing socket of validating proxy", e);
+                    log.warn("Error occurred while closing socket of validating proxy", e);
                 }
             }
         }
