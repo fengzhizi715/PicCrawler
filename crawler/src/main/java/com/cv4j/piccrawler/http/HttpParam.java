@@ -1,13 +1,10 @@
 package com.cv4j.piccrawler.http;
 
 import com.cv4j.piccrawler.domain.Proxy;
-import com.cv4j.piccrawler.utils.NoEmptyHashMap;
+import com.safframework.tony.common.collection.NoEmptyHashMap;
 import lombok.Getter;
-import org.apache.http.HttpHost;
 import org.apache.http.impl.cookie.BasicClientCookie;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
