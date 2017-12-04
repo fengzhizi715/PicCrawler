@@ -1,5 +1,6 @@
 package com.cv4j.piccrawler.utils;
 
+import com.cv4j.piccrawler.domain.Proxy;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpHost;
 
@@ -203,7 +204,6 @@ public class Utils {
 
         return null;
     }
-
 
     /**
      * 检测代理是否可用

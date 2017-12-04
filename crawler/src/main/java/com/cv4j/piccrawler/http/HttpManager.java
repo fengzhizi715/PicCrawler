@@ -271,14 +271,14 @@ public class HttpManager {
                         httpClient = createHttpClient(timeOut,httpHost,cookie);
                     } else {
                         log.info("proxy："+proxy.toString()+" 代理不可用");
-                        proxy.setFailureTimes(proxy.getFailureTimes()+1);
-                        if (proxy.isDiscardProxy()) {
+                        proxy.setFailureTimes(proxy.getFailureTimes()+1); // proxy的失败次数+1
+                        if (proxy.isDiscardProxy()) {                     // 如果proxy的失败次数到了可被丢弃的次数，那么会从内置的ProxyPool中删除该Proxy
                             log.info("proxy："+proxy.toString()+"被丢弃");
                             httpParam.getProxyPool().remove(proxy);
                         }
                         httpClient = createHttpClient(timeOut,null,cookie);
                     }
-                } else {
+                } else { // 代理池中无代理可用的情况
                     httpClient = createHttpClient(timeOut,null,cookie);
                 }
             } else {
