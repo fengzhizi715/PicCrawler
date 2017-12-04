@@ -1,7 +1,12 @@
 package com.cv4j.piccrawler.utils;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.http.HttpHost;
+
 import java.io.*;
+import java.net.InetSocketAddress;
 import java.net.MalformedURLException;
+import java.net.Socket;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.UUID;
@@ -9,6 +14,7 @@ import java.util.UUID;
 /**
  * Created by tony on 2017/10/10.
  */
+@Slf4j
 public class Utils {
 
     public static final String PIC_REGEX = ".*\\.(jpg|jpeg|gif|bmp|png|webp|svg).*";
@@ -65,6 +71,11 @@ public class Utils {
         return directory;
     }
 
+    /**
+     * 尝试根据图片的地址来获取图片的格式
+     * @param url
+     * @return
+     */
     public static String tryToGetPicFormat(String url) {
 
         if (url == null) return null;
@@ -176,6 +187,11 @@ public class Utils {
         return url;
     }
 
+    /**
+     * 获取url的host作为referer
+     * @param urlString
+     * @return
+     */
     public static String getReferer(String urlString) {
 
         try {
@@ -186,5 +202,35 @@ public class Utils {
         }
 
         return null;
+    }
+
+
+    /**
+     * 检测代理是否可用
+     * @param proxy
+     * @return
+     */
+    public static boolean checkProxy(HttpHost proxy) {
+
+        if (proxy == null) return false;
+
+        Socket socket = null;
+        try {
+            socket = new Socket();
+            InetSocketAddress endpointSocketAddr = new InetSocketAddress(proxy.getHostName(), proxy.getPort());
+            socket.connect(endpointSocketAddr, 3000);
+            return true;
+        } catch (IOException e) {
+            log.warn("FAILRE - CAN not connect!  remote: " + proxy);
+            return false;
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    log.warn("Error occurred while closing socket of validating proxy", e);
+                }
+            }
+        }
     }
 }

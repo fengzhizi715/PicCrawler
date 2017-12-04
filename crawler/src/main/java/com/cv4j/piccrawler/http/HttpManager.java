@@ -252,35 +252,6 @@ public class HttpManager {
         return response;
     }
 
-    /**
-     * 检测代理是否可用
-     * @param proxy
-     * @return
-     */
-    private boolean checkProxy(HttpHost proxy) {
-
-        if (proxy == null) return false;
-
-        Socket socket = null;
-        try {
-            socket = new Socket();
-            InetSocketAddress endpointSocketAddr = new InetSocketAddress(proxy.getHostName(), proxy.getPort());
-            socket.connect(endpointSocketAddr, 3000);
-            return true;
-        } catch (IOException e) {
-            log.warn("FAILRE - CAN not connect!  remote: " + proxy);
-            return false;
-        } finally {
-            if (socket != null) {
-                try {
-                    socket.close();
-                } catch (IOException e) {
-                    log.warn("Error occurred while closing socket of validating proxy", e);
-                }
-            }
-        }
-    }
-
     private CloseableHttpClient getHttpClient() {
 
         if (useProxyPool) {
@@ -294,7 +265,7 @@ public class HttpManager {
 
                 if (proxy!=null) {
                     HttpHost httpHost = proxy.toHttpHost();
-                    boolean check = checkProxy(httpHost);
+                    boolean check = Utils.checkProxy(httpHost);
                     if (check) { // 代理检测成功，使用代理
                         log.info("proxy："+proxy.toString()+" 代理可用");
                         httpClient = createHttpClient(timeOut,httpHost,cookie);
@@ -331,7 +302,7 @@ public class HttpManager {
 
                 if (proxy!=null) {
                     HttpHost httpHost = proxy.toHttpHost();
-                    boolean check = checkProxy(httpHost);
+                    boolean check = Utils.checkProxy(httpHost);
                     if (check) { // 代理检测成功，使用代理
                         log.info("proxy："+proxy.toString()+" 代理可用");
                         httpClient = createHttpClient(timeOut,httpHost,cookie);
