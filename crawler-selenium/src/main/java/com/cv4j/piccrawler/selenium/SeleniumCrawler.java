@@ -16,33 +16,32 @@ import java.util.List;
  */
 public class SeleniumCrawler {
 
-    private static CrawlerClient crawlerClient;
     private PicParser picParser = new PicParser();
+
+    private CrawlerClient crawlerClient = CrawlerClient.get()
+            .timeOut(6000)
+            .fileStrategy(new FileStrategy() {
+
+                @Override
+                public String filePath() {
+                    return "temp";
+                }
+
+                @Override
+                public String picFormat() {
+                    return "png";
+                }
+
+                @Override
+                public FileGenType genType() {
+
+                    return FileGenType.AUTO_INCREMENT;
+                }
+            })
+            .build();
 
     static {
         System.setProperty("webdriver.chrome.driver", "crawler-selenium/chromedriver");
-
-        crawlerClient = CrawlerClient.get()
-                .timeOut(6000)
-                .fileStrategy(new FileStrategy() {
-
-                    @Override
-                    public String filePath() {
-                        return "temp";
-                    }
-
-                    @Override
-                    public String picFormat() {
-                        return "png";
-                    }
-
-                    @Override
-                    public FileGenType genType() {
-
-                        return FileGenType.AUTO_INCREMENT;
-                    }
-                })
-                .build();
     }
 
     public void downloadPic(String url) {
