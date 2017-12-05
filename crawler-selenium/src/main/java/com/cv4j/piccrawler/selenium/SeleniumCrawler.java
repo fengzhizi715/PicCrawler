@@ -58,7 +58,7 @@ public class SeleniumCrawler {
     /**
      *
      * @param url
-     * @param scrollDownNum 鼠标滚动到屏幕底部到次数
+     * @param scrollDownNum 模拟鼠标滚动到屏幕底部到次数
      */
     public void downloadPic(String url,int scrollDownNum) {
 
@@ -70,19 +70,24 @@ public class SeleniumCrawler {
 
         crawlerClient.downloadPics(urls);
 
-        for (int i=0;i<scrollDownNum-1;i++) {
+        if (scrollDownNum>1) {
 
-            Utils.scrollDown(driver);
-            try {
-                Thread.sleep(2000);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+            for (int i=0;i<scrollDownNum-1;i++) {
+
+                Utils.scrollDown(driver);
+
+                try {
+                    Thread.sleep(2000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+
+                html = driver.getPageSource();
+
+                urls = parseHtmlToImages(html,picParser);
+
+                crawlerClient.downloadPics(urls);
             }
-            html = driver.getPageSource();
-
-            urls = parseHtmlToImages(html,picParser);
-
-            crawlerClient.downloadPics(urls);
         }
     }
 
