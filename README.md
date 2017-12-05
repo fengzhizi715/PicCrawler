@@ -298,5 +298,19 @@ fun main(args: Array<String>) {
 }
 ```
 
+## 1.8 增加了通过Selenium模拟页面滚动来抓取网页图片
+
+需要使用Selenium的话，在单独的crawler-selenium module中
+
+```java
+SeleniumCrawlerClient client = new SeleniumCrawlerClient();
+client.downloadPic("...",3);
+``` 
+
+在这里webdriver采用chromedriver，对于不同的操作系统chromedriver需要使用对应的版本。    
+        
+
+
+
 # ChangeLog
 [版本更新记录](CHANGELOG.md)
