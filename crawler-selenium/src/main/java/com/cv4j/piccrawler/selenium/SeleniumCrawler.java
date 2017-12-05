@@ -16,19 +16,13 @@ import java.util.List;
  */
 public class SeleniumCrawler {
 
+    private static CrawlerClient crawlerClient;
+    private PicParser picParser = new PicParser();
+
     static {
         System.setProperty("webdriver.chrome.driver", "crawler-selenium/chromedriver");
-    }
 
-    public void downloadPic(String url) {
-
-        WebDriver driver = new ChromeDriver();
-
-        driver.get(url);
-        String html = driver.getPageSource();
-        List<String> urls = parseHtmlToImages(html,new PicParser());
-
-        CrawlerClient.get()
+        crawlerClient = CrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -48,8 +42,17 @@ public class SeleniumCrawler {
                         return FileGenType.AUTO_INCREMENT;
                     }
                 })
-                .build()
-                .downloadPics(urls);
+                .build();
+    }
+
+    public void downloadPic(String url) {
+
+        WebDriver driver = new ChromeDriver();
+
+        driver.get(url);
+        String html = driver.getPageSource();
+        List<String> urls = parseHtmlToImages(html,picParser);
+        crawlerClient.downloadPics(urls);
     }
 
     /**
@@ -63,32 +66,9 @@ public class SeleniumCrawler {
 
         driver.get(url);
         String html = driver.getPageSource();
-        List<String> urls = parseHtmlToImages(html,new PicParser());
+        List<String> urls = parseHtmlToImages(html,picParser);
 
-        System.out.println("step 1");
-
-        CrawlerClient.get()
-                .timeOut(6000)
-                .fileStrategy(new FileStrategy() {
-
-                    @Override
-                    public String filePath() {
-                        return "temp";
-                    }
-
-                    @Override
-                    public String picFormat() {
-                        return "png";
-                    }
-
-                    @Override
-                    public FileGenType genType() {
-
-                        return FileGenType.AUTO_INCREMENT;
-                    }
-                })
-                .build()
-                .downloadPics(urls);
+        crawlerClient.downloadPics(urls);
 
         for (int i=0;i<scrollDownNum-1;i++) {
 
@@ -100,30 +80,9 @@ public class SeleniumCrawler {
             }
             html = driver.getPageSource();
 
-            urls = parseHtmlToImages(html,new PicParser());
+            urls = parseHtmlToImages(html,picParser);
 
-            CrawlerClient.get()
-                    .timeOut(6000)
-                    .fileStrategy(new FileStrategy() {
-
-                        @Override
-                        public String filePath() {
-                            return "temp";
-                        }
-
-                        @Override
-                        public String picFormat() {
-                            return "png";
-                        }
-
-                        @Override
-                        public FileGenType genType() {
-
-                            return FileGenType.AUTO_INCREMENT;
-                        }
-                    })
-                    .build()
-                    .downloadPics(urls);
+            crawlerClient.downloadPics(urls);
         }
     }
 
