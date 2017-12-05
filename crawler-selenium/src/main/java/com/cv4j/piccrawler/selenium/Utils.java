@@ -12,6 +12,10 @@ import java.io.IOException;
  */
 public class Utils {
 
+    static {
+        System.setProperty("webdriver.chrome.driver", "crawler-selenium/chromedriver");
+    }
+
     /**
      * 对当前对url进行截屏，一方面可以做调试使用看能否进入到该页面，另一方面截屏的图片未来可以做ocr使用
      * @param url

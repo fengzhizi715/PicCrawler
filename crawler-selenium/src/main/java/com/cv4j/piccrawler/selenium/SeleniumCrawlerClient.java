@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by tony on 2017/12/5.
  */
-public class SeleniumCrawler {
+public class SeleniumCrawlerClient {
 
     private PicParser picParser = new PicParser();
 
