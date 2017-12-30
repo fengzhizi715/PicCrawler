@@ -14,10 +14,10 @@ repositories {
 dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.12'
 
-    compile "io.reactivex.rxjava2:rxjava:2.1.5"
+    compile "io.reactivex.rxjava2:rxjava:2.1.8"
     compile "org.apache.httpcomponents:httpclient:4.5.2"
     compile 'org.jsoup:jsoup:1.10.3'
-    compile "tony-common:tony-common-utils:1.2.3"
+    compile "tony-common:tony-common-utils:1.2.4"
     compile 'org.slf4j:slf4j-api:1.7.20'
     compile 'ch.qos.logback:logback-classic:1.1.7'
     compile 'ch.qos.logback:logback-core:1.1.7'
@@ -42,7 +42,7 @@ publish{
     userOrg = 'fengzhizi715'
     groupId = 'com.cv4j.piccrawler'
     artifactId = 'crawler'
-    publishVersion = '0.5.1'
+    publishVersion = '0.5.2'
     desc = 'this is a crawler library only for pictures'
     website = 'https://github.com/fengzhizi715/PicCrawler'
 }
