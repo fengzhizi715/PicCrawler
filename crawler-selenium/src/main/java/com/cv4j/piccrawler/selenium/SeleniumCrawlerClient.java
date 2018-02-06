@@ -104,4 +104,10 @@ public class SeleniumCrawlerClient {
 
         return urls;
     }
+
+    public static void main(String[] args) {
+
+        SeleniumCrawlerClient client = new SeleniumCrawlerClient();
+        client.downloadPic("https://toutiao.io/",3);
+    }
 }
