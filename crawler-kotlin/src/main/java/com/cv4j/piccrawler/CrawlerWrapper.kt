@@ -33,7 +33,7 @@ fun downloadPic(init: CrawlerWrapper.() -> Unit) {
 private fun doDownloadPic(wrap: CrawlerWrapper) {
 
     if (wrap.autoReferer && wrap.referer.isNullOrBlank()) {
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .ua(wrap.ua)
                 .autoReferer()
                 .timeOut(wrap.timeOut)
@@ -42,7 +42,7 @@ private fun doDownloadPic(wrap: CrawlerWrapper) {
                 .build()
                 .downloadPic(wrap.url)
     } else {
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .ua(wrap.ua)
                 .referer(wrap.referer)
                 .timeOut(wrap.timeOut)
@@ -65,7 +65,7 @@ fun downloadWebPageImages(init: CrawlerWrapper.() -> Unit) {
 private fun doDownloadWebPageImages(wrap: CrawlerWrapper) {
 
     if (wrap.autoReferer && wrap.referer.isNullOrBlank()) {
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .ua(wrap.ua)
                 .autoReferer()
                 .timeOut(wrap.timeOut)
@@ -73,7 +73,7 @@ private fun doDownloadWebPageImages(wrap: CrawlerWrapper) {
                 .build()
                 .downloadWebPageImages(wrap.url)
     } else {
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .ua(wrap.ua)
                 .referer(wrap.ua)
                 .timeOut(wrap.timeOut)

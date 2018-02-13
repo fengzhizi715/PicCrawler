@@ -28,7 +28,7 @@ import java.util.concurrent.ExecutionException;
  * Created by tony on 2017/9/11.
  */
 @Slf4j
-public class CrawlerClient {
+public class PicCrawlerClient {
 
     private int repeat = 1;                    // 下载单张图片的重复次数，对下载网页中对图片无效
     private int sleepTime = 0;                 // 每次请求url时先sleep一段时间
@@ -38,24 +38,24 @@ public class CrawlerClient {
     private boolean isWebPage = false;         // 是否下载网页的图片
     private PageParser pageParser;
 
-    private CrawlerClient() {
+    private PicCrawlerClient() {
 
         httpManager = HttpManager.get();
         downloadManager = DownloadManager.get();
     }
 
-    public static CrawlerClient get() {
+    public static PicCrawlerClient get() {
 
-        return new CrawlerClient();
+        return new PicCrawlerClient();
     }
 
-    /******************* CrawlerClient 的配置 Start *******************／
+    /******************* PicCrawlerClient 的配置 Start *******************／
 
     /**
      * @param userAgent 添加User-Agent
      * @return
      */
-    public CrawlerClient ua(String userAgent) {
+    public PicCrawlerClient ua(String userAgent) {
 
         if (Preconditions.isNotBlank(userAgent)) {
             addHeader("User-Agent",userAgent);
@@ -67,7 +67,7 @@ public class CrawlerClient {
      * @param referer
      * @return
      */
-    public CrawlerClient referer(String referer) {
+    public PicCrawlerClient referer(String referer) {
 
         if (Preconditions.isNotBlank(referer)) {
             addHeader("Referer",referer);
@@ -76,10 +76,10 @@ public class CrawlerClient {
     }
 
     /**
-     * 使用了autoReferer()，就不需要在使用referer()，比较适合懒人使用
+     * 使用了autoReferer()，就不需要再使用referer()，比较适合懒人使用
      * @return
      */
-    public CrawlerClient autoReferer() {
+    public PicCrawlerClient autoReferer() {
 
         httpParamBuilder.autoReferer();
         return this;
@@ -89,7 +89,7 @@ public class CrawlerClient {
      * @param timeOut 设置超时时间
      * @return
      */
-    public CrawlerClient timeOut(int timeOut) {
+    public PicCrawlerClient timeOut(int timeOut) {
 
         if (timeOut>0) {
             httpParamBuilder.timeOut(timeOut);
@@ -101,7 +101,7 @@ public class CrawlerClient {
      * @param fileStrategy 设置生成文件的策略
      * @return
      */
-    public CrawlerClient fileStrategy(FileStrategy fileStrategy) {
+    public PicCrawlerClient fileStrategy(FileStrategy fileStrategy) {
 
         if (fileStrategy!=null) {
             downloadManager.setFileStrategy(fileStrategy);
@@ -113,7 +113,7 @@ public class CrawlerClient {
      * @param repeat 设置重复次数，只对单个图片有效，对下载网页中的图片无效。
      * @return
      */
-    public CrawlerClient repeat(int repeat) {
+    public PicCrawlerClient repeat(int repeat) {
 
         if (repeat > 0) {
             this.repeat = repeat;
@@ -125,7 +125,7 @@ public class CrawlerClient {
      * @param sleepTime 每次请求url时先sleep一段时间，单位是milliseconds
      * @return
      */
-    public CrawlerClient sleep(int sleepTime) {
+    public PicCrawlerClient sleep(int sleepTime) {
 
         if (sleepTime > 0) {
             this.sleepTime = sleepTime;
@@ -138,7 +138,7 @@ public class CrawlerClient {
      * @param proxy 代理的host
      * @return
      */
-    public CrawlerClient addProxy(Proxy proxy) {
+    public PicCrawlerClient addProxy(Proxy proxy) {
 
         if (proxy!=null) {
             httpParamBuilder.addProxy(proxy);
@@ -151,7 +151,7 @@ public class CrawlerClient {
      * @param proxyList 代理的host的列表
      * @return
      */
-    public CrawlerClient addProxyPool(List<Proxy> proxyList) {
+    public PicCrawlerClient addProxyPool(List<Proxy> proxyList) {
 
         if (Preconditions.isNotBlank(proxyList)) {
             httpParamBuilder.addProxyPool(proxyList);
@@ -164,7 +164,7 @@ public class CrawlerClient {
      * @param cookie 设置浏览器的cookie
      * @return
      */
-    public CrawlerClient cookie(BasicClientCookie cookie) {
+    public PicCrawlerClient cookie(BasicClientCookie cookie) {
 
         if (Preconditions.isNotBlank(cookie)) {
             httpParamBuilder.cookie(cookie);
@@ -178,7 +178,7 @@ public class CrawlerClient {
      * @param value
      * @return
      */
-    public CrawlerClient addHeader(String name,String value) {
+    public PicCrawlerClient addHeader(String name, String value) {
 
         httpParamBuilder.addHeader(name,value);
         return this;
@@ -188,13 +188,13 @@ public class CrawlerClient {
      * 对于CrawlerClient必须要使用builder()，设置的一些配置就无效了
      * @return
      */
-    public CrawlerClient build() {
+    public PicCrawlerClient build() {
 
         httpManager.setHttpParam(httpParamBuilder.build());
         return this;
     }
 
-    /******************* CrawlerClient 的配置 End *******************／
+    /******************* PicCrawlerClient 的配置 End *******************／
 
     /**
      * 下载图片
