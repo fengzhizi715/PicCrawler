@@ -15,5 +15,5 @@ dependencies {
 
     implementation 'org.seleniumhq.selenium:selenium-java:3.7.1'
 
-    implementation 'com.cv4j.piccrawler:crawler:0.5.3'
+    implementation 'com.cv4j.piccrawler:crawler:1.0.0'
 }

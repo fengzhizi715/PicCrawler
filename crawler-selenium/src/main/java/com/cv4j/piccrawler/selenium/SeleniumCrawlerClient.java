@@ -1,6 +1,7 @@
 package com.cv4j.piccrawler.selenium;
 
-import com.cv4j.piccrawler.CrawlerClient;
+
+import com.cv4j.piccrawler.PicCrawlerClient;
 import com.cv4j.piccrawler.download.strategy.FileGenType;
 import com.cv4j.piccrawler.download.strategy.FileStrategy;
 import com.cv4j.piccrawler.parser.PicParser;
@@ -18,7 +19,7 @@ public class SeleniumCrawlerClient {
 
     private PicParser picParser = new PicParser();
 
-    private CrawlerClient crawlerClient = CrawlerClient.get()
+    private PicCrawlerClient crawlerClient = PicCrawlerClient.get()
             .timeOut(6000)
             .fileStrategy(new FileStrategy() {
 
