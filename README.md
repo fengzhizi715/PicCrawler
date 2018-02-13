@@ -8,6 +8,9 @@
 
 最初是为了批量抓取图片验证码，然后导入tensorflow进行训练，才有了这个库。
 
+它的结构如下图所示
+![](PicCrawlerClient.png)
+
 # 下载安装:
 
 对于Java项目如果使用gradle构建，由于默认不是使用jcenter，需要在相应module的build.gradle中配置
