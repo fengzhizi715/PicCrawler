@@ -21,7 +21,7 @@ repositories {
 Gradle:
 
 ```groovy
-implementation 'com.cv4j.piccrawler:crawler:0.5.3'
+implementation 'com.cv4j.piccrawler:crawler:1.0.0'
 ```
 
 
@@ -47,7 +47,7 @@ Maven:
 <dependency>
   <groupId>com.cv4j.piccrawler</groupId>
   <artifactId>crawler</artifactId>
-  <version>0.5.3</version>
+  <version>1.0.0</version>
   <type>pom</type>
 </dependency>
 ```
@@ -58,7 +58,7 @@ Maven:
 
 ```java
         String url = "..."; // 图片的地址
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -87,7 +87,7 @@ Maven:
 
 ```java
         String url = "..."; // 图片的地址
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -117,7 +117,7 @@ Maven:
 ```java
         String url = "..."; // 图片的地址
 
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -151,7 +151,7 @@ Maven:
 ## 1.2 下载多张图片
 ```java
         List<String> urls = ...; // 多张图片地址的集合
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -178,7 +178,7 @@ Maven:
 ## 1.3 下载某个网页的全部图片
 ```java
         String url = "..."; // 针对某一个网址
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -205,7 +205,7 @@ Maven:
 ## 1.4 下载多个网页的全部图片
 ```java
         List<String> urls = ...; // 多个网页的集合
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
@@ -234,7 +234,7 @@ Maven:
 
 ```java
         String url = ...; // 针对某一个网址
-        CrawlerClient.get()
+        PicCrawlerClient.get()
                 .timeOut(6000)
                 .fileStrategy(new FileStrategy() {
 
