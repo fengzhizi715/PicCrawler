@@ -1,6 +1,12 @@
 PicCrawler
 ===
 
+Version 1.0.0
+---
+2018-02-13
+ *  优化代码，底层依赖的包全部升级到最新版本
+ *  原先的CrawlerClient改成PicCrawlerClient
+
 Version 0.5.0
 ---
 2017-11-28
