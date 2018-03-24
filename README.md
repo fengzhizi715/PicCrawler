@@ -311,9 +311,11 @@ client.downloadPic("...",3);
 ``` 
 
 在这里webdriver采用chromedriver，对于不同的操作系统chromedriver需要使用对应的版本。    
-        
-
 
 
 # ChangeLog
 [版本更新记录](CHANGELOG.md)
+
+
+# 联系方式:
+QQ交流群：490882934
