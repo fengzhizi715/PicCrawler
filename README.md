@@ -313,6 +313,10 @@ client.downloadPic("...",3);
 在这里webdriver采用chromedriver，对于不同的操作系统chromedriver需要使用对应的版本。    
 
 
+# 专业的爬虫
+
+笔者开发的专业的爬虫框架: [NetDiscovery](https://github.com/fengzhizi715/NetDiscovery)
+
 # ChangeLog
 [版本更新记录](CHANGELOG.md)
 
